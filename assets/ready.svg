@@ -1,0 +1,13 @@
+<svg width="100%" height="88" viewBox="0 0 520 88" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="readyTitle">
+  <title id="readyTitle">Готово к работе за 30 секунд</title>
+  <rect width="520" height="88" rx="16" fill="#0f172a" stroke="#10b981" stroke-opacity="0.2"/>
+  <g transform="translate(14,12)">
+    <rect width="28" height="28" rx="14" fill="#10b981" fill-opacity="0.15"/>
+    <path d="M 9 14 L 13 18 L 19 10" stroke="#10b981" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="52" y="30" font-family="Inter, sans-serif" font-size="12" font-weight="800" fill="#ffffff">Готово к работе за 30 секунд</text>
+  <text x="52" y="46" font-family="Inter, sans-serif" font-size="11" fill="#ffffff" opacity="0.5">Без Docker, без ключей OpenAI, без лишней настройки</text>
+  <rect x="16" y="58" width="488" height="22" rx="11" fill="#ffffff" fill-opacity="0.06"/>
+  <circle cx="26" cy="69" r="3" fill="#34d399"/>
+  <text x="34" y="73" font-family="JetBrains Mono, monospace" font-size="10.5" fill="#ffffff" opacity="0.7">эндпоинты:  /health  /v1/models  /v1/chat/completions  /v1/messages</text>
+</svg>
