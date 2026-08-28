@@ -1,4 +1,5 @@
-<svg width="100%" height="110" viewBox="0 0 1160 110" xmlns="http://www.w3.org/2000/svg" role="img">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1160" height="110" viewBox="0 0 1160 110" xmlns="http://www.w3.org/2000/svg" role="img">
   <rect width="1160" height="110" rx="16" fill="#0f172a" stroke="#ec4899" stroke-opacity="0.18"/>
   <text x="24" y="30" font-family="Inter, sans-serif" font-size="13" font-weight="800" fill="#ffffff">Что конвертируется автоматически</text>
   <g font-family="Inter, sans-serif" font-size="11" fill="#ffffff">

@@ -1,7 +1,7 @@
 <div align="center">
 
 <!-- HERO BANNER -->
-<img src="assets/hero.svg" width="100%" alt="zai-proxy — высокопроизводительный прокси">
+<img src="assets/hero.svg" alt="zai-proxy hero">
 
 <p>
   <a href="#быстрый-старт"><img src="https://img.shields.io/badge/Node-%3E%3D18.18-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="node"/></a>&nbsp;
@@ -80,7 +80,7 @@
 <div align="center">
 
 <!-- FEATURES BANNER -->
-<img src="assets/features.svg" width="100%" alt="Возможности zai-proxy">
+<img src="assets/features.svg" alt="features">
 
 </div>
 
@@ -92,7 +92,7 @@
 
 <div align="center">
 
-<img src="assets/architecture.svg" width="100%" alt="Архитектура zai-proxy">
+<img src="assets/architecture.svg" alt="architecture">
 
 </div>
 
@@ -218,7 +218,7 @@ curl http://localhost:18888/v1/chat/completions \
 
 <br/>
 
-<img src="assets/ready.svg" width="520" alt="Готово к работе">
+<img src="assets/ready.svg" alt="ready">
 
 </td>
 </tr>
@@ -232,7 +232,7 @@ curl http://localhost:18888/v1/chat/completions \
 
 <div align="center">
 
-<img src="assets/env-banner.svg" width="100%" alt="Переменные окружения">
+<img src="assets/env-banner.svg" alt="env">
 
 </div>
 
@@ -280,7 +280,7 @@ MODEL_MAP_JSON={"my-model":"zai_auto"}
 
 <div align="center">
 
-<img src="assets/models-banner.svg" width="100%" alt="Умный роутинг">
+<img src="assets/models-banner.svg" alt="models">
 
 </div>
 
@@ -570,7 +570,7 @@ claude --model claude-sonnet-4-5 "объясни этот код"
 
 <div align="center">
 
-<img src="assets/convert-banner.svg" width="100%" alt="Конвертация Claude Code">
+<img src="assets/convert-banner.svg" alt="convert">
 
 </div>
 
@@ -692,7 +692,7 @@ MODEL_MAP_JSON='{"my-model":"zai_custom_backend_id"}' npm start
 
 <div align="center">
 
-<img src="assets/footer.svg" width="100%" alt="zai-proxy footer">
+<img src="assets/footer.svg" alt="footer">
 
 <sub>Нашли ошибку в README или есть идея — открывайте Issue или Pull Request</sub>
 

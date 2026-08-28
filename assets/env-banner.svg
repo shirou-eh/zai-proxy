@@ -1,4 +1,5 @@
-<svg width="100%" height="54" viewBox="0 0 1160 54" xmlns="http://www.w3.org/2000/svg" role="img">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1160" height="54" viewBox="0 0 1160 54" xmlns="http://www.w3.org/2000/svg" role="img">
   <rect width="1160" height="54" rx="14" fill="#1e1b4b" stroke="#7c3aed" stroke-opacity="0.22"/>
   <text x="24" y="22" font-family="JetBrains Mono, monospace" font-size="11" font-weight="800" fill="#a78bfa" letter-spacing="1.2">ENV  •  ПРИМЕР  •  СКОПИРУЙ И ПОДСТРОЙ</text>
   <text x="24" y="38" font-family="JetBrains Mono, monospace" font-size="10" fill="#ffffff" opacity="0.55">PORT=18888  •  ZAI_BACKEND_URL=https://...  •  PROXY_API_KEY=...  •  MODEL_MAP_JSON='{"my-model":"zai_custom"}'</text>

@@ -1,4 +1,5 @@
-<svg width="100%" height="420" viewBox="0 0 1200 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="heroTitle heroDesc">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="420" viewBox="0 0 1200 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="heroTitle heroDesc">
   <title id="heroTitle">zai-proxy — высокопроизводительный прокси для z.ai и AutoClaw</title>
   <desc id="heroDesc">OpenAI и Anthropic совместимый шлюз на TypeScript с нулевыми зависимостями и потоковым SSE</desc>
   <defs>

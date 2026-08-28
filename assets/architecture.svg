@@ -1,4 +1,5 @@
-<svg width="100%" height="300" viewBox="0 0 1160 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="archTitle">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1160" height="300" viewBox="0 0 1160 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="archTitle">
   <title id="archTitle">Архитектура zai-proxy</title>
   <defs>
     <linearGradient id="abg" x1="0%" y1="0%" x2="100%" y2="0%">

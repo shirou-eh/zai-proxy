@@ -1,4 +1,5 @@
-<svg width="100%" height="420" viewBox="0 0 1160 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="featTitle">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1160" height="420" viewBox="0 0 1160 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="featTitle">
   <title id="featTitle">Возможности zai-proxy</title>
   <defs>
     <linearGradient id="fbg" x1="0%" y1="0%" x2="100%" y2="100%">
