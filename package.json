@@ -1,0 +1,41 @@
+{
+  "name": "zai-proxy",
+  "version": "2.1.0",
+  "description": "High-performance OpenAI + Anthropic (Claude Code compatible) proxy for z.ai / AutoClaw backend — TypeScript, zero runtime deps, streaming SSE with full tool_use support",
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "files": [
+    "dist/",
+    "src/"
+  ],
+  "scripts": {
+    "dev": "tsx watch --clear-screen=false src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
+    "prebuild": "npm run clean"
+  },
+  "keywords": [
+    "proxy",
+    "openai",
+    "anthropic",
+    "claude-code",
+    "zai",
+    "autoclaw",
+    "sse",
+    "typescript",
+    "glm"
+  ],
+  "author": "zai-proxy",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.18.0"
+  },
+  "engineStrict": false,
+  "devDependencies": {
+    "@types/node": "^22.7.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}

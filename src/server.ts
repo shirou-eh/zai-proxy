@@ -1,0 +1,218 @@
+import * as http from 'node:http';
+import * as crypto from 'node:crypto';
+import type { ProxyConfig } from './config.js';
+import type { Logger } from './utils/logger.js';
+import { getModelsList, getModelMapSnapshot } from './models.js';
+import { handleOpenAIChat } from './handlers/openai.js';
+import { handleAnthropicMessages } from './handlers/anthropic.js';
+import { getJwtCacheInfo } from './auth.js';
+import type { OpenAIChatRequest } from './types/openai.js';
+import type { AnthropicMessagesRequest } from './types/anthropic.js';
+
+function sendJson(res: http.ServerResponse, code: number, obj: unknown, corsOrigin: string): void {
+  const b = JSON.stringify(obj);
+  res.writeHead(code, {
+    'Content-Type': 'application/json',
+    'Content-Length': Buffer.byteLength(b),
+    'Access-Control-Allow-Origin': corsOrigin,
+  });
+  res.end(b);
+}
+
+function parseAuthHeader(req: http.IncomingMessage): string {
+  const h = req.headers['authorization'];
+  if (typeof h === 'string' && h.startsWith('Bearer ')) return h.slice(7).trim();
+  if (Array.isArray(h)) {
+    for (const v of h) if (typeof v === 'string' && v.startsWith('Bearer ')) return v.slice(7).trim();
+  }
+  const x = req.headers['x-api-key'];
+  if (typeof x === 'string' && x.trim()) return x.trim();
+  if (Array.isArray(x) && x[0] && typeof x[0] === 'string') return x[0].trim();
+  // AutoClaw legacy
+  const alt = req.headers['x-authorization'] as string | undefined;
+  if (typeof alt === 'string' && alt.trim()) return alt.trim();
+  // query ?api_key=...
+  try {
+    const url = new URL(req.url ?? '/', 'http://localhost');
+    const q = url.searchParams.get('api_key') ?? url.searchParams.get('key');
+    if (q) return q.trim();
+  } catch {}
+  return '';
+}
+
+export function createServer(config: ProxyConfig, logger: Logger): http.Server {
+  const server = http.createServer(async (req, res) => {
+    const requestId = crypto.randomUUID();
+    const url = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
+
+    res.setHeader('X-Request-Id', requestId);
+    // Security headers
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('Referrer-Policy', 'no-referrer');
+
+    // CORS preflight
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204, {
+        'Access-Control-Allow-Origin': config.corsAllowOrigin,
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Api-Key, X-Authorization, Anthropic-Version, X-Requested-With',
+        'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+        'Access-Control-Max-Age': '86400',
+        'Access-Control-Allow-Credentials': 'false',
+      });
+      res.end();
+      return;
+    }
+
+    res.setHeader('Access-Control-Allow-Origin', config.corsAllowOrigin);
+    res.setHeader('Vary', 'Origin');
+
+    // Optional API key guard (health & root — public)
+    const isPublic =
+      url.pathname === '/' ||
+      url.pathname === '/health' ||
+      url.pathname === '/v1/health' ||
+      url.pathname === '/ping';
+    if (config.proxyApiKey !== undefined && !isPublic) {
+      const token = parseAuthHeader(req);
+      if (token !== config.proxyApiKey) {
+        logger.debug(requestId, `AUTH fail path=${url.pathname} ip=${req.socket.remoteAddress} tokenLen=${token.length}`);
+        sendJson(
+          res,
+          401,
+          { error: { message: 'invalid api key', type: 'authentication_error', code: 401 } },
+          config.corsAllowOrigin,
+        );
+        return;
+      }
+    }
+
+    logger.debug(requestId, `${req.method} ${url.pathname} ip=${req.socket.remoteAddress ?? 'unknown'}`);
+
+    // --- Root ---
+    if (url.pathname === '/' && req.method === 'GET') {
+      return sendJson(
+        res,
+        200,
+        {
+          name: 'zai-proxy',
+          version: '2.1.0',
+          uptime: Math.floor(process.uptime()),
+          endpoints: ['/health', '/v1/models', '/v1/chat/completions', '/v1/messages'],
+        },
+        config.corsAllowOrigin,
+      );
+    }
+
+    // --- Health ---
+    if ((url.pathname === '/health' || url.pathname === '/v1/health' || url.pathname === '/ping') && req.method === 'GET') {
+      const base: Record<string, unknown> = { status: 'ok', uptime: process.uptime(), version: '2.1.0' };
+      if (config.enableHealthDetails) {
+        base['model_map'] = getModelMapSnapshot();
+        base['jwt_cache'] = getJwtCacheInfo();
+        base['config'] = {
+          backend: config.backendUrl,
+          bodyLimit: config.bodyLimitBytes,
+          timeoutMs: config.backendTimeoutMs,
+          maxRetries: config.backendMaxRetries,
+          logLevel: config.logLevel,
+          auth: config.proxyApiKey ? 'enabled' : 'disabled',
+          cors: config.corsAllowOrigin,
+        };
+        base['memory'] = process.memoryUsage();
+      }
+      return sendJson(res, 200, base, config.corsAllowOrigin);
+    }
+
+    // --- Models ---
+    if (url.pathname === '/v1/models' || url.pathname.endsWith('/v1/models')) {
+      if (req.method !== 'GET') {
+        return sendJson(res, 405, { error: { message: 'GET only', code: 405 } }, config.corsAllowOrigin);
+      }
+      return sendJson(res, 200, getModelsList(), config.corsAllowOrigin);
+    }
+
+    // --- Anthropic ---
+    if (url.pathname.endsWith('/v1/messages')) {
+      if (req.method !== 'POST') {
+        return sendJson(
+          res,
+          405,
+          { type: 'error', error: { type: 'invalid_request_error', message: 'POST only' } },
+          config.corsAllowOrigin,
+        );
+      }
+      const body = await readJsonBody(req, config.bodyLimitBytes, res, config.corsAllowOrigin);
+      if (body === null) return;
+      return handleAnthropicMessages(body as AnthropicMessagesRequest, req, res, config, logger, requestId);
+    }
+
+    // --- OpenAI ---
+    if (url.pathname.endsWith('/v1/chat/completions') || url.pathname.endsWith('/chat/completions')) {
+      if (req.method !== 'POST') {
+        return sendJson(res, 405, { error: { message: 'POST only', code: 405 } }, config.corsAllowOrigin);
+      }
+      const body = await readJsonBody(req, config.bodyLimitBytes, res, config.corsAllowOrigin);
+      if (body === null) return;
+      const openAIbody = body as OpenAIChatRequest;
+      if (!openAIbody.model) openAIbody.model = 'auto';
+      if (!openAIbody.messages) {
+        return sendJson(res, 400, { error: { message: 'messages is required', code: 400 } }, config.corsAllowOrigin);
+      }
+      return handleOpenAIChat(openAIbody, req, res, config, logger, requestId);
+    }
+
+    // --- 404 ---
+    sendJson(res, 404, { error: { message: 'not found', path: url.pathname, code: 404 } }, config.corsAllowOrigin);
+  });
+
+  server.keepAliveTimeout = 65_000;
+  server.headersTimeout = 66_000;
+  server.requestTimeout = 0;
+  server.timeout = 0;
+
+  return server;
+}
+
+async function readJsonBody(
+  req: http.IncomingMessage,
+  limit: number,
+  res: http.ServerResponse,
+  corsOrigin: string,
+): Promise<unknown | null> {
+  let raw = '';
+  let total = 0;
+  let truncated = false;
+
+  try {
+    for await (const chunk of req) {
+      const c = typeof chunk === 'string' ? chunk : (chunk as Buffer).toString('utf8');
+      const len = Buffer.byteLength(c);
+      total += len;
+      if (total > limit) {
+        truncated = true;
+        // Drain rest
+        req.destroy();
+        break;
+      }
+      raw += c;
+    }
+  } catch {
+    if (!res.writableEnded) sendJson(res, 400, { error: { message: 'failed to read body', code: 400 } }, corsOrigin);
+    return null;
+  }
+
+  if (truncated) {
+    if (!res.writableEnded) sendJson(res, 413, { error: { message: `payload too large, limit ${limit} bytes`, code: 413 } }, corsOrigin);
+    return null;
+  }
+
+  if (!raw.trim()) return {};
+  try {
+    return JSON.parse(raw) as unknown;
+  } catch (e) {
+    const msg = e instanceof Error ? e.message.slice(0, 200) : 'bad json';
+    if (!res.writableEnded) sendJson(res, 400, { error: { message: `bad json: ${msg}`, code: 400 } }, corsOrigin);
+    return null;
+  }
+}
