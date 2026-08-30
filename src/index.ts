@@ -36,9 +36,25 @@ async function main(): Promise<void> {
     logger.info(`contract: autoclaw-request-contract-v1 (dynamic headers + session ids + body model rewrite + SDK transport headers)`);
   };
 
-  server.listen(config.port, config.listenAddress, onListening);
-
-  server.on('error', (err: NodeJS.ErrnoException) => {
+  // Dual-stack '::' may be unavailable on hosts without IPv6 (e.g. GitHub
+  // ubuntu runners): fall back to IPv4 '0.0.0.0' instead of dying.
+  const listenOnce = (address: string, onFatal: (err: NodeJS.ErrnoException) => void): void => {
+    const onError = (err: NodeJS.ErrnoException): void => {
+      server.removeListener('error', onError);
+      if (
+        address === '::' &&
+        (err.code === 'EADDRNOTAVAIL' || err.code === 'EAFNOSUPPORT' || err.code === 'EPFNOSUPPORT')
+      ) {
+        logger.info(`bind ${address} failed (${err.code}) - falling back to 0.0.0.0 (IPv4 only)`);
+        listenOnce('0.0.0.0', onFatal);
+        return;
+      }
+      onFatal(err);
+    };
+    server.once('error', onError);
+    server.listen(config.port, address, onListening);
+  };
+  listenOnce(config.listenAddress, (err) => {
     if (err.code === 'EADDRINUSE') {
       console.error(`Port ${config.port} already in use (is another proxy running?)`);
     } else {
