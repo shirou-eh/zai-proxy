@@ -20,6 +20,7 @@ export type LogLevel = 'debug' | 'info' | 'error';
 
 /** Static AutoClaw client headers, mirrors providers.zai.models[*].headers in openclaw.json. */
 export const STATIC_AUTOCLAW_HEADERS: Record<string, string> = {
+  'X-Harness-Type': 'zcode',
   'X-Tm': 'win',
   'X-Version': '1.17.8',
   'X-Channel': 'official',
