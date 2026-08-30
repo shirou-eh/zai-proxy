@@ -40,6 +40,7 @@ const REQUIRED_CONTRACT_HEADERS: Array<[string, string | RegExp]> = [
   ['x-session-key', /^agent:.+/],
   ['x-client-type', /^(pc|web|app)$/],
   ['x-product', 'autoclaw'],
+  ['x-harness-type', 'zcode'],
   ['x-tm', 'win'],
   ['x-version', '1.17.8'],
   ['x-channel', 'official'],
