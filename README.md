@@ -252,6 +252,17 @@ curl http://localhost:18888/v1/chat/completions \
 | `CORS_ALLOW_ORIGIN` | `*` | Р—Р°РіРѕР»РѕРІРѕРє `Access-Control-Allow-Origin` |
 | `HEALTH_DETAILS` | `true` | РџРѕРєР°Р·С‹РІР°С‚СЊ Р»Рё РґРµС‚Р°Р»Рё РІ `/health` |
 | `MODEL_MAP_JSON` | *(РїСѓСЃС‚Рѕ)* | JSON РґР»СЏ СЂР°СЃС€РёСЂРµРЅРёСЏ РјР°РїС‹ РјРѕРґРµР»РµР№, РЅР°РїСЂРёРјРµСЂ `'{"my-glm":"zai_custom"}'` |
+| `BACKEND_MAX_CONCURRENCY` | `0` | 0 = безлимит (макс. пропускная способность). N>0 — не более N одновременных запросов к бэкенду, остальные ждут в очереди |
+| `ZAI_THINKING_DEFAULT` | `on` | Режим мышления по умолчанию, когда клиент не выразил предпочтений: `on` / `off` / `auto` (не отправлять поле) |
+| `NORMALIZE_MAX_TOKENS` | `false` | `1` — переписывать `max_tokens` в `max_completion_tokens` (как у реального клиента для zai) |
+| `LOG_DEBUG_BODY` | `false` | `1` — дампить исходящий запрос (URL + заголовки + тело) в debug-лог |
+| `JWT_REFRESH_WAIT_MS` | `5000` | Сколько ждать обновления JWT при 401 (реальный клиент: 20×250мс) |
+| `JWT_REFRESH_POLL_MS` | `250` | Интервал опроса request-headers.json при ожидании обновления JWT |
+| `AUTOCLAW_ORIGIN` | `desktop` | Режим источника: `desktop` (X-Client-Type: pc) / `web` / `app` — влияет на origin-заголовки |
+| `AUTOCLAW_AGENT_ID` | `main` | Стабильный X-Agent-Id контракта |
+| `AUTOCLAW_SESSION_ID` | *(uuid)* | Стабильный X-Session-Id (генерируется при старте, если не задан) |
+| `AUTOCLAW_SESSION_KEY` | `agent:<id>:<sid>` | Стабильный X-Session-Key контракта |
+| `AUTOCLAW_STATIC_HEADERS` | *(см. код)* | JSON со статическими заголовками клиента (X-Tm, X-Version, X-Channel, X-Lang) |
 
 <details>
 <summary>РџСЂРёРјРµСЂ С„Р°Р№Р»Р° <code>.env</code></summary>
@@ -697,3 +708,37 @@ MODEL_MAP_JSON='{"my-model":"zai_custom_backend_id"}' npm start
 <sub>РќР°С€Р»Рё РѕС€РёР±РєСѓ РІ README РёР»Рё РµСЃС‚СЊ РёРґРµСЏ вЂ” РѕС‚РєСЂС‹РІР°Р№С‚Рµ Issue РёР»Рё Pull Request</sub>
 
 </div>
+
+
+---
+
+## AutoClaw request-contract (v3.0+)
+
+Прокси воспроизводит исходящие запросы десктопного клиента AutoClaw 1:1:
+
+- **Динамические заголовки** из `~/.openclaw-autoclaw/request-headers.json` (включая per-session `sessionHeaders`), кэш по mtime+size
+- **Контракт**: `X-Request-Id` (uuid на запрос), `X-Request-Model`, `X-Session-Id`, `X-Agent-Id`, `X-Session-Key`, `X-Client-Type` (pc/web/app), `X-Product: autoclaw`, origin-заголовки `X-Autoclaw-Source/Channel/Chat-Type/Session-Key/Agent-Id`
+- **SDK-транспорт**: `User-Agent: OpenAI/JS 6.39.1` + полный набор `X-Stainless-*` как у OpenAI SDK, вшитого в клиент
+- **Тело запроса**: модель без префикса вендора (`zaicoding_glm-5.3` → `glm-5.3`), `stream: true` всегда, `enable_thinking` вместо `reasoning_effort`, опционально `max_completion_tokens`
+- **401-refresh**: при 401 прокси ждёт обновления JWT в `request-headers.json` до 5с и ретраит — как `waitForAutoClawRefreshedZaiAuthHeaders` в клиенте
+- **client-sign (X-Client-Sig/PoW) не эмулируется** — для провайдера `zai` он отключён в самом клиенте
+
+### Thinking-маппинг
+
+| Источник | Как задать | Результат в теле запроса |
+|---|---|---|
+| OpenAI-клиент | `reasoning_effort: "high"` | `enable_thinking: true` |
+| OpenAI-клиент | `reasoning_effort: "off"` | `enable_thinking: false` |
+| Anthropic-клиент | `thinking: {type: "enabled", budget_tokens: N}` | `enable_thinking: true` |
+| Anthropic-клиент | `thinking: {type: "disabled"}` | `enable_thinking: false` |
+| Не задано | — | `ZAI_THINKING_DEFAULT` (по умолчанию `on`) |
+
+`reasoning_effort` никогда не пересылается на бэкенд — реальный клиент для zai его не отправляет.
+
+### Тесты
+
+```bash
+npm test    # мок-бэкенд + e2e: 35 контрактных проверок (заголовки, тело, thinking)
+```
+
+CI (GitHub Actions) гоняет typecheck + build + e2e на каждый push/PR.

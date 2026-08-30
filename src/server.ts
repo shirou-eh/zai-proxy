@@ -7,9 +7,36 @@ import { handleOpenAIChat } from './handlers/openai.js';
 import { handleAnthropicMessages } from './handlers/anthropic.js';
 import { getJwtCacheInfo } from './auth.js';
 import { invalidateRequestHeadersCache } from './contract.js';
+import { ConcurrencyLimiter } from './concurrency.js';
 import * as fs from 'node:fs';
 import type { OpenAIChatRequest } from './types/openai.js';
 import type { AnthropicMessagesRequest } from './types/anthropic.js';
+
+/** Process-wide request stats for /health. */
+export interface ProxyStats {
+  totalRequests: number;
+  openaiRequests: number;
+  anthropicRequests: number;
+  lastBackendStatus: number | null;
+  lastBackendAt: number | null;
+  startedAt: number;
+}
+
+export const proxyStats: ProxyStats = {
+  totalRequests: 0,
+  openaiRequests: 0,
+  anthropicRequests: 0,
+  lastBackendStatus: null,
+  lastBackendAt: null,
+  startedAt: Date.now(),
+};
+
+let sharedGate: ConcurrencyLimiter | null = null;
+export function getBackendGate(config: ProxyConfig): ConcurrencyLimiter | null {
+  if (config.backendMaxConcurrency <= 0) return null;
+  if (sharedGate === null) sharedGate = new ConcurrencyLimiter(config.backendMaxConcurrency);
+  return sharedGate;
+}
 
 function sendJson(res: http.ServerResponse, code: number, obj: unknown, corsOrigin: string): void {
   const b = JSON.stringify(obj);
@@ -147,7 +174,21 @@ export function createServer(config: ProxyConfig, logger: Logger): http.Server {
           originMode: config.originMode,
           agentId: config.agentId,
           sessionKey: config.sessionKey,
+          maxConcurrency: config.backendMaxConcurrency,
+          normalizeMaxTokens: config.normalizeMaxTokens,
         };
+        base['stats'] = {
+          totalRequests: proxyStats.totalRequests,
+          openaiRequests: proxyStats.openaiRequests,
+          anthropicRequests: proxyStats.anthropicRequests,
+          lastBackendStatus: proxyStats.lastBackendStatus,
+          lastBackendAt: proxyStats.lastBackendAt === null ? null : new Date(proxyStats.lastBackendAt).toISOString(),
+          uptimeSeconds: Math.floor((Date.now() - proxyStats.startedAt) / 1000),
+          concurrency: sharedGate === null
+            ? { mode: 'unlimited' }
+            : { mode: 'limited', max: config.backendMaxConcurrency, active: sharedGate.activeCount, queued: sharedGate.queuedCount },
+        };
+        base['jwt_cache'] = getJwtCacheInfo();
         base['memory'] = process.memoryUsage();
       }
       return sendJson(res, 200, base, config.corsAllowOrigin);
@@ -171,9 +212,12 @@ export function createServer(config: ProxyConfig, logger: Logger): http.Server {
           config.corsAllowOrigin,
         );
       }
+      proxyStats.totalRequests += 1;
+      proxyStats.anthropicRequests += 1;
       const body = await readJsonBody(req, config.bodyLimitBytes, res, config.corsAllowOrigin);
       if (body === null) return;
-      return handleAnthropicMessages(body as AnthropicMessagesRequest, req, res, config, logger, requestId);
+      const gate = getBackendGate(config);
+      return handleAnthropicMessages(body as AnthropicMessagesRequest, req, res, config, logger, requestId, gate ?? undefined);
     }
 
     // --- OpenAI ---
@@ -181,6 +225,8 @@ export function createServer(config: ProxyConfig, logger: Logger): http.Server {
       if (req.method !== 'POST') {
         return sendJson(res, 405, { error: { message: 'POST only', code: 405 } }, config.corsAllowOrigin);
       }
+      proxyStats.totalRequests += 1;
+      proxyStats.openaiRequests += 1;
       const body = await readJsonBody(req, config.bodyLimitBytes, res, config.corsAllowOrigin);
       if (body === null) return;
       const openAIbody = body as OpenAIChatRequest;
@@ -188,7 +234,8 @@ export function createServer(config: ProxyConfig, logger: Logger): http.Server {
       if (!openAIbody.messages) {
         return sendJson(res, 400, { error: { message: 'messages is required', code: 400 } }, config.corsAllowOrigin);
       }
-      return handleOpenAIChat(openAIbody, req, res, config, logger, requestId);
+      const gate = getBackendGate(config);
+      return handleOpenAIChat(openAIbody, req, res, config, logger, requestId, gate ?? undefined);
     }
 
     // --- 404 ---

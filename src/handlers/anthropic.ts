@@ -1,7 +1,8 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { ProxyConfig } from '../config.js';
 import type { Logger } from '../utils/logger.js';
-import { backendFetchWithRetry, type BackendFetchConfig } from '../backend.js';
+import { backendFetchWithRetry, type BackendFetchConfig, type BackendGate } from '../backend.js';
+import { resolveZaiEnableThinking, applyZaiThinkingEnvelope, isReasoningCapableModel } from '../thinking.js';
 import { backendStreamAndAggregate } from '../upstream.js';
 import { sseDone } from '../utils/sse.js';
 import { convertAnthropicRequestToOpenAI } from '../convert/anthropic-to-openai.js';
@@ -69,8 +70,20 @@ function backendConfig(config: ProxyConfig): BackendFetchConfig {
     sessionId: config.sessionId,
     sessionKey: config.sessionKey,
     proxyApiKey: config.proxyApiKey,
+    normalizeMaxTokens: config.normalizeMaxTokens,
+    debugDumpRequest: config.debugDumpRequest,
+    jwtRefreshWaitMs: config.jwtRefreshWaitMs,
+    jwtRefreshPollMs: config.jwtRefreshPollMs,
     anthropic: true,
   };
+}
+
+export function makeBackendGate(config: ProxyConfig): BackendGate | undefined {
+  if (config.backendMaxConcurrency <= 0) return undefined;
+  // Lazy require keeps the module dependency-free when unlimited.
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { ConcurrencyLimiter } = require('../concurrency.js') as typeof import('../concurrency.js');
+  return new ConcurrencyLimiter(config.backendMaxConcurrency);
 }
 
 export async function handleAnthropicMessages(
@@ -80,6 +93,7 @@ export async function handleAnthropicMessages(
   config: ProxyConfig,
   logger: Logger,
   requestId: string,
+  gateOverride?: BackendGate,
 ): Promise<void> {
   const vErr = validateAnthropicRequest(body);
   if (vErr !== null) {
@@ -108,16 +122,29 @@ export async function handleAnthropicMessages(
   const { openAIRequest, backendModel, stream } = conv;
   const backendBody: Record<string, unknown> = { ...openAIRequest } as unknown as Record<string, unknown>;
   delete backendBody['stream_options'];
+
+  // zai thinking envelope from the Anthropic thinking block:
+  // {type:'enabled',budget_tokens} -> enable_thinking=true, {type:'disabled'} -> false.
+  // No thinking block -> ZAI_THINKING_DEFAULT env decides (default on).
+  const anthThinking = (body as { thinking?: { type?: unknown } }).thinking;
+  const thinkingRequested = anthThinking !== undefined && anthThinking !== null;
+  const thinkingEnabledValue =
+    thinkingRequested && (anthThinking as { type?: unknown }).type === 'enabled';
+  const thinkingDecision = resolveZaiEnableThinking({ thinkingRequested, thinkingEnabledValue });
+  applyZaiThinkingEnvelope(backendBody, thinkingDecision, isReasoningCapableModel(backendModel));
+
   // Upstream is ALWAYS streamed (real-client behavior) unless disabled via FORCE_UPSTREAM_STREAM=0.
   if (config.forceUpstreamStream) delete backendBody['stream'];
 
+  const gate = gateOverride ?? makeBackendGate(config);
+
   logger.debug(
     requestId,
-    `ANTHROPIC ${stream ? 'STREAM' : 'NONSTREAM'} model=${anthropicModel} -> ${backendModel} msgs=${openAIRequest.messages.length}`,
+    `ANTHROPIC ${stream ? 'STREAM' : 'NONSTREAM'} model=${anthropicModel} -> ${backendModel} msgs=${openAIRequest.messages.length} thinking=${thinkingDecision}`,
   );
 
-  if (stream) await handleAnthropicStream(backendBody, anthropicModel, backendModel, res, config, logger, requestId);
-  else await handleAnthropicNonStream(backendBody, anthropicModel, backendModel, res, config, logger, requestId);
+  if (stream) await handleAnthropicStream(backendBody, anthropicModel, backendModel, res, config, logger, requestId, gate);
+  else await handleAnthropicNonStream(backendBody, anthropicModel, backendModel, res, config, logger, requestId, gate);
 }
 
 async function handleAnthropicStream(
@@ -128,6 +155,7 @@ async function handleAnthropicStream(
   config: ProxyConfig,
   logger: Logger,
   requestId: string,
+  gate?: BackendGate,
 ): Promise<void> {
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
@@ -158,6 +186,7 @@ async function handleAnthropicStream(
       backendConfig(config),
       logger,
       requestId,
+      gate,
     );
 
     if (!r.ok) {
@@ -252,13 +281,14 @@ async function handleAnthropicNonStream(
   config: ProxyConfig,
   logger: Logger,
   requestId: string,
+  gate?: BackendGate,
 ): Promise<void> {
   try {
     let openAI: OpenAIChatResponse;
 
     if (config.forceUpstreamStream) {
       // Upstream stream:true + aggregate into a chat.completion (real-client transport)
-      openAI = await backendStreamAndAggregate(backendBody, backendModel, backendConfig(config), logger, requestId);
+      openAI = await backendStreamAndAggregate(backendBody, backendModel, backendConfig(config), logger, requestId, gate);
     } else {
       const r = await backendFetchWithRetry(
         { ...backendBody, stream: false },

@@ -3,7 +3,8 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { ProxyConfig } from '../config.js';
 import type { Logger } from '../utils/logger.js';
 import { resolveModel } from '../models.js';
-import { backendFetchWithRetry, type BackendFetchConfig } from '../backend.js';
+import { backendFetchWithRetry, type BackendFetchConfig, type BackendGate } from '../backend.js';
+import { resolveZaiEnableThinking, applyZaiThinkingEnvelope, isReasoningCapableModel } from '../thinking.js';
 import { backendStreamAndAggregate } from '../upstream.js';
 import { sseEncode, sseDone } from '../utils/sse.js';
 import type { OpenAIChatRequest, OpenAIChatChunk, OpenAIChatResponse } from '../types/openai.js';
@@ -93,7 +94,19 @@ function backendConfig(config: ProxyConfig): BackendFetchConfig {
     sessionId: config.sessionId,
     sessionKey: config.sessionKey,
     proxyApiKey: config.proxyApiKey,
+    normalizeMaxTokens: config.normalizeMaxTokens,
+    debugDumpRequest: config.debugDumpRequest,
+    jwtRefreshWaitMs: config.jwtRefreshWaitMs,
+    jwtRefreshPollMs: config.jwtRefreshPollMs,
   };
+}
+
+export function makeBackendGate(config: ProxyConfig): BackendGate | undefined {
+  if (config.backendMaxConcurrency <= 0) return undefined;
+  // Lazy require keeps the module dependency-free when unlimited.
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { ConcurrencyLimiter } = require('../concurrency.js') as typeof import('../concurrency.js');
+  return new ConcurrencyLimiter(config.backendMaxConcurrency);
 }
 
 export async function handleOpenAIChat(
@@ -103,6 +116,7 @@ export async function handleOpenAIChat(
   config: ProxyConfig,
   logger: Logger,
   requestId: string,
+  gateOverride?: BackendGate,
 ): Promise<void> {
   const clientRequestedStream = body.stream === true;
   const clientModel = String(body.model || 'auto');
@@ -128,8 +142,15 @@ export async function handleOpenAIChat(
   const backendBody: Record<string, unknown> = { ...(normalized as unknown as Record<string, unknown>) };
   delete backendBody['stream_options'];
 
+  // zai thinking envelope (real-client buildParams):
+  // enable_thinking = Boolean(reasoningEffort), reasoning_effort never forwarded.
+  const thinkingDecision = resolveZaiEnableThinking({ explicitEffort: backendBody['reasoning_effort'] });
+  applyZaiThinkingEnvelope(backendBody, thinkingDecision, isReasoningCapableModel(backendModel));
+
   // Upstream is ALWAYS streamed (real-client behavior) unless disabled via FORCE_UPSTREAM_STREAM=0.
   if (config.forceUpstreamStream) delete backendBody['stream'];
+
+  const gate = gateOverride ?? makeBackendGate(config);
 
   if (clientRequestedStream || config.forceUpstreamStream) {
     await handleOpenAIStream(
@@ -142,6 +163,7 @@ export async function handleOpenAIChat(
       config,
       logger,
       requestId,
+      gate,
     );
   } else {
     await handleOpenAINonStream(backendBody, clientModel, backendModel, res, config, logger, requestId);
@@ -158,6 +180,7 @@ async function handleOpenAIStream(
   config: ProxyConfig,
   logger: Logger,
   requestId: string,
+  gate?: BackendGate,
 ): Promise<void> {
   logger.debug(requestId, `OPENAI STREAM start model=${backendModel} client=${clientModel} clientStream=${clientRequestedStream}`);
 
@@ -195,7 +218,7 @@ async function handleOpenAIStream(
   }
 
   try {
-    const r = await backendFetchWithRetry(backendBody, backendModel, backendConfig(config), logger, requestId);
+    const r = await backendFetchWithRetry(backendBody, backendModel, backendConfig(config), logger, requestId, gate);
 
     if (!r.ok) {
       const t = await r.text().catch(() => '');

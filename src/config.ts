@@ -39,6 +39,15 @@ export interface ProxyConfig {
   readonly agentId: string;
   readonly sessionId: string;
   readonly sessionKey: string;
+  /** 0 = unlimited (default). N>0 = max in-flight backend requests. */
+  readonly backendMaxConcurrency: number;
+  /** Rewrite max_tokens -> max_completion_tokens for zai (real-client field). */
+  readonly normalizeMaxTokens: boolean;
+  /** Dump full outgoing request (url+headers+body) at debug level. */
+  readonly debugDumpRequest: boolean;
+  /** 401 JWT-refresh wait budget (ms). Real client: 20 x 250ms = 5000ms. */
+  readonly jwtRefreshWaitMs: number;
+  readonly jwtRefreshPollMs: number;
 }
 
 function parsePort(v: string | undefined, fallback: number): number {
@@ -131,6 +140,12 @@ export function loadConfig(): ProxyConfig {
   const sessionKey =
     (process.env['AUTOCLAW_SESSION_KEY'] ?? '').trim() || `agent:${agentId}:${sessionId}`;
   const staticHeaders = parseStaticHeaders(process.env['AUTOCLAW_STATIC_HEADERS']);
+  // 0 = unlimited (default, maximum throughput). N>0 = queue beyond N in-flight.
+  const backendMaxConcurrency = parseIntEnv('BACKEND_MAX_CONCURRENCY', process.env['BACKEND_MAX_CONCURRENCY'], 0);
+  const normalizeMaxTokens = parseBool(process.env['NORMALIZE_MAX_TOKENS'], false);
+  const debugDumpRequest = parseBool(process.env['LOG_DEBUG_BODY'], false);
+  const jwtRefreshWaitMs = parseIntEnv('JWT_REFRESH_WAIT_MS', process.env['JWT_REFRESH_WAIT_MS'], 5_000);
+  const jwtRefreshPollMs = parseIntEnv('JWT_REFRESH_POLL_MS', process.env['JWT_REFRESH_POLL_MS'], 250);
 
   // Clamp body limit to sane range 1KB .. 100MB
   if (bodyLimitBytes < 1024 || bodyLimitBytes > 100 * 1024 * 1024) {
@@ -164,5 +179,10 @@ export function loadConfig(): ProxyConfig {
     agentId,
     sessionId,
     sessionKey,
+    backendMaxConcurrency,
+    normalizeMaxTokens,
+    debugDumpRequest,
+    jwtRefreshWaitMs,
+    jwtRefreshPollMs,
   };
 }

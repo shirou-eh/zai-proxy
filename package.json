@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "zai-proxy",
   "version": "3.0.0",
   "description": "High-performance OpenAI + Anthropic (Claude Code compatible) proxy for z.ai / AutoClaw backend вЂ” TypeScript, zero runtime deps, streaming SSE with full tool_use support",
@@ -13,6 +13,7 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit",
+    "test": "tsx test/e2e.ts",
     "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
     "prebuild": "npm run clean"
   },

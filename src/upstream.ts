@@ -7,7 +7,7 @@
  */
 import * as crypto from 'node:crypto';
 import type { Logger } from './utils/logger.js';
-import { backendFetchWithRetry, type BackendFetchConfig } from './backend.js';
+import { backendFetchWithRetry, type BackendFetchConfig, type BackendGate } from './backend.js';
 import type { OpenAIChatChunk, OpenAIChatResponse } from './types/openai.js';
 
 export interface StreamAggregateError extends Error {
@@ -30,13 +30,14 @@ export async function backendStreamAndAggregate(
   config: BackendFetchConfig,
   logger: Logger,
   requestId: string,
+  gate?: BackendGate,
 ): Promise<OpenAIChatResponse> {
   const body: Record<string, unknown> = { ...backendBody, stream: true };
   // NOTE: the real client does NOT set stream_options for the zai provider —
   // include_usage injection only happens for minimax/moonshot base URLs.
   // Usage still arrives in the final chunk for zai.
 
-  const r = await backendFetchWithRetry(body, backendModel, config, logger, requestId);
+  const r = await backendFetchWithRetry(body, backendModel, config, logger, requestId, gate);
 
   if (!r.ok || !r.body) {
     const t = await r.text().catch(() => '');
