@@ -18,7 +18,7 @@ async function main(): Promise<void> {
   const onListening = (): void => {
     const map = getModelMapSnapshot();
     logger.info(
-      `zai-proxy v3.0.0 on http://${config.host}:${config.port} ` +
+      `zai-proxy v3.1.0 on http://${config.host}:${config.port} ` +
         `backend=${config.backendUrl} ` +
         `models=${Object.keys(map).length} ` +
         `log=${config.logLevel}${config.logJson ? '+json' : ''} ` +

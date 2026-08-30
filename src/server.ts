@@ -147,7 +147,7 @@ export function createServer(config: ProxyConfig, logger: Logger): http.Server {
         200,
         {
           name: 'zai-proxy',
-          version: '3.0.0',
+          version: '3.1.0',
           uptime: Math.floor(process.uptime()),
           endpoints: ['/health', '/v1/models', '/v1/chat/completions', '/v1/messages'],
           contract: 'autoclaw-request-contract-v1',
@@ -158,7 +158,7 @@ export function createServer(config: ProxyConfig, logger: Logger): http.Server {
 
     // --- Health ---
     if ((url.pathname === '/health' || url.pathname === '/v1/health' || url.pathname === '/ping') && req.method === 'GET') {
-      const base: Record<string, unknown> = { status: 'ok', uptime: process.uptime(), version: '3.0.0' };
+      const base: Record<string, unknown> = { status: 'ok', uptime: process.uptime(), version: '3.1.0' };
       if (config.enableHealthDetails) {
         base['model_map'] = getModelMapSnapshot();
         base['jwt_cache'] = getJwtCacheInfo();

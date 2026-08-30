@@ -119,7 +119,7 @@ npm run build
 
 # Р·Р°РїСѓСЃС‚Рё
 npm start
-# -> zai-proxy v3.0.0 on http://127.0.0.1:18888
+# -> zai-proxy v3.1.0 on http://127.0.0.1:18888
 ```
 
 Р РµР¶РёРј СЂР°Р·СЂР°Р±РѕС‚РєРё СЃ Р°РІС‚Рѕ-РїРµСЂРµР·Р°РїСѓСЃРєРѕРј:
@@ -164,7 +164,7 @@ curl http://localhost:18888/health | jq
 ```json
 {
   "status": "ok",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "model_map": {
     "auto": "zai_auto",
     "glm-5.3": "zaicoding_glm-5.3"
