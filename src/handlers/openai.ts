@@ -218,7 +218,7 @@ async function handleOpenAIStream(
   }
 
   try {
-    const r = await backendFetchWithRetry(backendBody, backendModel, backendConfig(config), logger, requestId, gate);
+    const r = await backendFetchWithRetry({ ...backendBody, stream: true }, backendModel, backendConfig(config), logger, requestId, gate);
 
     if (!r.ok) {
       const t = await r.text().catch(() => '');
