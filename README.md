@@ -1,17 +1,17 @@
-<div align="center">
+﻿<div align="center">
 
 <!-- HERO BANNER -->
 <img src="assets/hero.svg" alt="zai-proxy hero">
 
 <p>
-  <a href="#быстрый-старт"><img src="https://img.shields.io/badge/Node-%3E%3D18.18-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="node"/></a>&nbsp;
-  <a href="#конфигурация"><img src="https://img.shields.io/badge/TypeScript-5.6-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="ts"/></a>&nbsp;
-  <a href="#лицензия"><img src="https://img.shields.io/badge/License-MIT-f59e0b?style=for-the-badge" alt="mit"/></a>&nbsp;
+  <a href="#Р±С‹СЃС‚СЂС‹Р№-СЃС‚Р°СЂС‚"><img src="https://img.shields.io/badge/Node-%3E%3D18.18-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="node"/></a>&nbsp;
+  <a href="#РєРѕРЅС„РёРіСѓСЂР°С†РёСЏ"><img src="https://img.shields.io/badge/TypeScript-5.6-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="ts"/></a>&nbsp;
+  <a href="#Р»РёС†РµРЅР·РёСЏ"><img src="https://img.shields.io/badge/License-MIT-f59e0b?style=for-the-badge" alt="mit"/></a>&nbsp;
   <img src="https://img.shields.io/badge/Zero_Runtime_Deps-0-7c3aed?style=for-the-badge" alt="zero deps"/>&nbsp;
   <img src="https://img.shields.io/badge/SSE_Streaming-OK-06b6d4?style=for-the-badge" alt="sse"/>
 </p>
 
-<sub>Совместим с <b>OpenAI SDK</b> • <b>Anthropic SDK</b> • <b>Claude Code</b> • <b>Cline</b> • <b>Roo Code</b> • Любым инструментом с поддержкой <code>claude-*</code></sub>
+<sub>РЎРѕРІРјРµСЃС‚РёРј СЃ <b>OpenAI SDK</b> вЂў <b>Anthropic SDK</b> вЂў <b>Claude Code</b> вЂў <b>Cline</b> вЂў <b>Roo Code</b> вЂў Р›СЋР±С‹Рј РёРЅСЃС‚СЂСѓРјРµРЅС‚РѕРј СЃ РїРѕРґРґРµСЂР¶РєРѕР№ <code>claude-*</code></sub>
 
 </div>
 
@@ -19,56 +19,56 @@
 
 <div align="center">
 
-| [Что это](#что-это) | [Возможности](#возможности) | [Архитектура](#архитектура) | [Быстрый старт](#быстрый-старт) | [Конфигурация](#конфигурация) | [Модели](#модели) | [API](#api) | [Примеры](#примеры) |
+| [Р§С‚Рѕ СЌС‚Рѕ](#С‡С‚Рѕ-СЌС‚Рѕ) | [Р’РѕР·РјРѕР¶РЅРѕСЃС‚Рё](#РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё) | [РђСЂС…РёС‚РµРєС‚СѓСЂР°](#Р°СЂС…РёС‚РµРєС‚СѓСЂР°) | [Р‘С‹СЃС‚СЂС‹Р№ СЃС‚Р°СЂС‚](#Р±С‹СЃС‚СЂС‹Р№-СЃС‚Р°СЂС‚) | [РљРѕРЅС„РёРіСѓСЂР°С†РёСЏ](#РєРѕРЅС„РёРіСѓСЂР°С†РёСЏ) | [РњРѕРґРµР»Рё](#РјРѕРґРµР»Рё) | [API](#api) | [РџСЂРёРјРµСЂС‹](#РїСЂРёРјРµСЂС‹) |
 |---|---|---|---|---|---|---|---|
 
 </div>
 
 ---
 
-## Что это
+## Р§С‚Рѕ СЌС‚Рѕ
 
-> **zai-proxy** — лёгкий, молниеносный шлюз, который притворяется одновременно **OpenAI** и **Anthropic**, а под капотом — **z.ai / AutoClaw** (`autoglm-api.autoglm.ai`).  
-> Подключаешь любой клиент — он думает, что говорит с `api.openai.com` или `api.anthropic.com`, а отвечает настоящий **GLM-5.3 / GLM-Coding**.
+> **zai-proxy** вЂ” Р»С‘РіРєРёР№, РјРѕР»РЅРёРµРЅРѕСЃРЅС‹Р№ С€Р»СЋР·, РєРѕС‚РѕСЂС‹Р№ РїСЂРёС‚РІРѕСЂСЏРµС‚СЃСЏ РѕРґРЅРѕРІСЂРµРјРµРЅРЅРѕ **OpenAI** Рё **Anthropic**, Р° РїРѕРґ РєР°РїРѕС‚РѕРј вЂ” **z.ai / AutoClaw** (`autoglm-api.autoglm.ai`).  
+> РџРѕРґРєР»СЋС‡Р°РµС€СЊ Р»СЋР±РѕР№ РєР»РёРµРЅС‚ вЂ” РѕРЅ РґСѓРјР°РµС‚, С‡С‚Рѕ РіРѕРІРѕСЂРёС‚ СЃ `api.openai.com` РёР»Рё `api.anthropic.com`, Р° РѕС‚РІРµС‡Р°РµС‚ РЅР°СЃС‚РѕСЏС‰РёР№ **GLM-5.3 / GLM-Coding**.
 
 <table>
 <tr>
 <td width="50%" valign="top">
 
-**Зачем нужен**
+**Р—Р°С‡РµРј РЅСѓР¶РµРЅ**
 
-- Использовать `Claude Code`, `Cursor`, `Continue`, `OpenAI SDK` с бэкендом z.ai без переписывания кода
-- Единая точка входа для всех моделей — один порт, один ключ
-- Потоковый `tool_use` без костылей — SSE в SSE, честный прокси
-- Ноль рантайм-зависимостей — чистый `node:http` и нативный `fetch`
+- РСЃРїРѕР»СЊР·РѕРІР°С‚СЊ `Claude Code`, `Cursor`, `Continue`, `OpenAI SDK` СЃ Р±СЌРєРµРЅРґРѕРј z.ai Р±РµР· РїРµСЂРµРїРёСЃС‹РІР°РЅРёСЏ РєРѕРґР°
+- Р•РґРёРЅР°СЏ С‚РѕС‡РєР° РІС…РѕРґР° РґР»СЏ РІСЃРµС… РјРѕРґРµР»РµР№ вЂ” РѕРґРёРЅ РїРѕСЂС‚, РѕРґРёРЅ РєР»СЋС‡
+- РџРѕС‚РѕРєРѕРІС‹Р№ `tool_use` Р±РµР· РєРѕСЃС‚С‹Р»РµР№ вЂ” SSE РІ SSE, С‡РµСЃС‚РЅС‹Р№ РїСЂРѕРєСЃРё
+- РќРѕР»СЊ СЂР°РЅС‚Р°Р№Рј-Р·Р°РІРёСЃРёРјРѕСЃС‚РµР№ вЂ” С‡РёСЃС‚С‹Р№ `node:http` Рё РЅР°С‚РёРІРЅС‹Р№ `fetch`
 
-**Ключевые цифры**
+**РљР»СЋС‡РµРІС‹Рµ С†РёС„СЂС‹**
 
-- Старт менее 200 мс, оверхед менее 15 мс
-- Около 5 МБ на диске, потребление памяти от 45 МБ
-- Keep-Alive 65 с, heartbeat 15 с, graceful shutdown 10 с
+- РЎС‚Р°СЂС‚ РјРµРЅРµРµ 200 РјСЃ, РѕРІРµСЂС…РµРґ РјРµРЅРµРµ 15 РјСЃ
+- РћРєРѕР»Рѕ 5 РњР‘ РЅР° РґРёСЃРєРµ, РїРѕС‚СЂРµР±Р»РµРЅРёРµ РїР°РјСЏС‚Рё РѕС‚ 45 РњР‘
+- Keep-Alive 65 СЃ, heartbeat 15 СЃ, graceful shutdown 10 СЃ
 
 </td>
 <td width="50%" valign="top">
 
-**Схема запроса**
+**РЎС…РµРјР° Р·Р°РїСЂРѕСЃР°**
 
 ```
-Клиент (OpenAI / Anthropic / Claude Code)
+РљР»РёРµРЅС‚ (OpenAI / Anthropic / Claude Code)
         |
         |  POST /v1/chat/completions
         |  POST /v1/messages
         v
    zai-proxy :18888
-   ├─ server.ts (CORS, Auth, лимиты)
-   ├─ models.ts (роутинг)
-   ├─ handlers + convert
-   └─ backend.ts (retry, timeout, SSE)
+   в”њв”Ђ server.ts (CORS, Auth, Р»РёРјРёС‚С‹)
+   в”њв”Ђ models.ts (СЂРѕСѓС‚РёРЅРі)
+   в”њв”Ђ handlers + convert
+   в””в”Ђ backend.ts (retry, timeout, SSE)
         |
         |  X-Authorization: JWT
         v
    autoglm-api.autoglm.ai
-   └─ GLM-5.3 / Turbo / Flash / Auto
+   в””в”Ђ GLM-5.3 / Turbo / Flash / Auto
 ```
 
 </td>
@@ -84,11 +84,11 @@
 
 </div>
 
-<a id="возможности"></a>
+<a id="РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё"></a>
 
 ---
 
-## Архитектура
+## РђСЂС…РёС‚РµРєС‚СѓСЂР°
 
 <div align="center">
 
@@ -98,64 +98,64 @@
 
 ---
 
-## Быстрый старт
+## Р‘С‹СЃС‚СЂС‹Р№ СЃС‚Р°СЂС‚
 
 <table>
 <tr>
 <td width="55%" valign="top">
 
-### 1. Установка
+### 1. РЈСЃС‚Р°РЅРѕРІРєР°
 
 ```bash
-# клонируй репозиторий
-git clone https://github.com/твой-ник/zai-proxy
+# РєР»РѕРЅРёСЂСѓР№ СЂРµРїРѕР·РёС‚РѕСЂРёР№
+git clone https://github.com/С‚РІРѕР№-РЅРёРє/zai-proxy
 cd zai-proxy
 
-# установи зависимости (только dev)
+# СѓСЃС‚Р°РЅРѕРІРё Р·Р°РІРёСЃРёРјРѕСЃС‚Рё (С‚РѕР»СЊРєРѕ dev)
 npm install
 
-# собери проект
+# СЃРѕР±РµСЂРё РїСЂРѕРµРєС‚
 npm run build
 
-# запусти
+# Р·Р°РїСѓСЃС‚Рё
 npm start
-# -> zai-proxy v2.1.0 on http://127.0.0.1:18888
+# -> zai-proxy v3.0.0 on http://127.0.0.1:18888
 ```
 
-Режим разработки с авто-перезапуском:
+Р РµР¶РёРј СЂР°Р·СЂР°Р±РѕС‚РєРё СЃ Р°РІС‚Рѕ-РїРµСЂРµР·Р°РїСѓСЃРєРѕРј:
 
 ```bash
 npm run dev
 ```
 
-> Порт по умолчанию `18888`, хост `127.0.0.1` — меняются через переменные окружения.
+> РџРѕСЂС‚ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ `18888`, С…РѕСЃС‚ `127.0.0.1` вЂ” РјРµРЅСЏСЋС‚СЃСЏ С‡РµСЂРµР· РїРµСЂРµРјРµРЅРЅС‹Рµ РѕРєСЂСѓР¶РµРЅРёСЏ.
 
-### 2. Настройка аутентификации
+### 2. РќР°СЃС‚СЂРѕР№РєР° Р°СѓС‚РµРЅС‚РёС„РёРєР°С†РёРё
 
-Прокси читает JWT из файла, который создает AutoClaw:
+РџСЂРѕРєСЃРё С‡РёС‚Р°РµС‚ JWT РёР· С„Р°Р№Р»Р°, РєРѕС‚РѕСЂС‹Р№ СЃРѕР·РґР°РµС‚ AutoClaw:
 
 ```
 ~/.openclaw-autoclaw/request-headers.json
 ```
 
-Формат файла — любой из вариантов:
+Р¤РѕСЂРјР°С‚ С„Р°Р№Р»Р° вЂ” Р»СЋР±РѕР№ РёР· РІР°СЂРёР°РЅС‚РѕРІ:
 
 ```json
-{ "headers": { "X-Authorization": "твой-jwt..." } }
+{ "headers": { "X-Authorization": "С‚РІРѕР№-jwt..." } }
 ```
 
-или
+РёР»Рё
 
 ```json
-{ "jwt": "твой-jwt..." }
+{ "jwt": "С‚РІРѕР№-jwt..." }
 ```
 
-> Кэш по `mtime + size`, фоновый `stat` с интервалом около 50 мс — не нагружает диск. При ошибках чтения возвращается последний успешный JWT.
+> РљСЌС€ РїРѕ `mtime + size`, С„РѕРЅРѕРІС‹Р№ `stat` СЃ РёРЅС‚РµСЂРІР°Р»РѕРј РѕРєРѕР»Рѕ 50 РјСЃ вЂ” РЅРµ РЅР°РіСЂСѓР¶Р°РµС‚ РґРёСЃРє. РџСЂРё РѕС€РёР±РєР°С… С‡С‚РµРЅРёСЏ РІРѕР·РІСЂР°С‰Р°РµС‚СЃСЏ РїРѕСЃР»РµРґРЅРёР№ СѓСЃРїРµС€РЅС‹Р№ JWT.
 
 </td>
 <td width="45%" valign="top">
 
-### 3. Проверка здоровья
+### 3. РџСЂРѕРІРµСЂРєР° Р·РґРѕСЂРѕРІСЊСЏ
 
 ```bash
 curl http://localhost:18888/health | jq
@@ -164,7 +164,7 @@ curl http://localhost:18888/health | jq
 ```json
 {
   "status": "ok",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "model_map": {
     "auto": "zai_auto",
     "glm-5.3": "zaicoding_glm-5.3"
@@ -177,7 +177,7 @@ curl http://localhost:18888/health | jq
 }
 ```
 
-### 4. Первый запрос
+### 4. РџРµСЂРІС‹Р№ Р·Р°РїСЂРѕСЃ
 
 ```bash
 curl http://localhost:18888/v1/chat/completions \
@@ -185,13 +185,13 @@ curl http://localhost:18888/v1/chat/completions \
   -d '{
     "model": "glm-5.3",
     "messages": [
-      {"role":"user","content":"Привет! Кто ты?"}
+      {"role":"user","content":"РџСЂРёРІРµС‚! РљС‚Рѕ С‚С‹?"}
     ]
   }'
 ```
 
 <details>
-<summary>Ответ</summary>
+<summary>РћС‚РІРµС‚</summary>
 
 ```json
 {
@@ -202,7 +202,7 @@ curl http://localhost:18888/v1/chat/completions \
     "index": 0,
     "message": {
       "role": "assistant",
-      "content": "Привет! Я GLM-5.3 — большая языковая модель от Zhipu AI."
+      "content": "РџСЂРёРІРµС‚! РЇ GLM-5.3 вЂ” Р±РѕР»СЊС€Р°СЏ СЏР·С‹РєРѕРІР°СЏ РјРѕРґРµР»СЊ РѕС‚ Zhipu AI."
     },
     "finish_reason": "stop"
   }],
@@ -226,9 +226,9 @@ curl http://localhost:18888/v1/chat/completions \
 
 ---
 
-## Конфигурация
+## РљРѕРЅС„РёРіСѓСЂР°С†РёСЏ
 
-> Все настройки — через переменные окружения. Обязательных полей нет — везде заданы разумные значения по умолчанию.
+> Р’СЃРµ РЅР°СЃС‚СЂРѕР№РєРё вЂ” С‡РµСЂРµР· РїРµСЂРµРјРµРЅРЅС‹Рµ РѕРєСЂСѓР¶РµРЅРёСЏ. РћР±СЏР·Р°С‚РµР»СЊРЅС‹С… РїРѕР»РµР№ РЅРµС‚ вЂ” РІРµР·РґРµ Р·Р°РґР°РЅС‹ СЂР°Р·СѓРјРЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ.
 
 <div align="center">
 
@@ -236,31 +236,31 @@ curl http://localhost:18888/v1/chat/completions \
 
 </div>
 
-| Переменная | По умолчанию | Описание |
+| РџРµСЂРµРјРµРЅРЅР°СЏ | РџРѕ СѓРјРѕР»С‡Р°РЅРёСЋ | РћРїРёСЃР°РЅРёРµ |
 |---|---|---|
-| `PORT` | `18888` | Порт прокси |
-| `HOST` / `BIND` | `127.0.0.1` | Хост для бинда |
-| `ZAI_BACKEND_URL` | `https://autoglm-api.autoglm.ai/autoclaw-proxy/proxy/autoclaw/chat/completions` | URL бэкенда z.ai |
-| `AUTOCLAW_REQ_HEADERS` / `JWT_PATH` | `~/.openclaw-autoclaw/request-headers.json` | Путь к файлу с JWT |
-| `PROXY_API_KEY` / `API_KEY` | *(пусто)* | Если задан — защита всех эндпоинтов кроме `/health` и `/` |
-| `LOG` / `LOG_LEVEL` | `info` | Уровень логов: `debug`, `info`, `error` |
-| `LOG_JSON` | `false` | `1` — JSON-логи для Loki / Datadog |
-| `BODY_LIMIT_BYTES` | `10485760` (10 МБ) | Лимит тела запроса (от 1 КБ до 100 МБ) |
-| `BACKEND_TIMEOUT_MS` | `120000` | Таймаут бэкенда в мс, `0` — без таймаута |
-| `BACKEND_MAX_RETRIES` | `3` | Количество попыток при `429 / 5xx / сетевом сбое` |
-| `BACKEND_RETRY_BASE_MS` | `400` | База для экспоненциального backoff |
-| `CORS_ALLOW_ORIGIN` | `*` | Заголовок `Access-Control-Allow-Origin` |
-| `HEALTH_DETAILS` | `true` | Показывать ли детали в `/health` |
-| `MODEL_MAP_JSON` | *(пусто)* | JSON для расширения мапы моделей, например `'{"my-glm":"zai_custom"}'` |
+| `PORT` | `18888` | РџРѕСЂС‚ РїСЂРѕРєСЃРё |
+| `HOST` / `BIND` | `127.0.0.1` | РҐРѕСЃС‚ РґР»СЏ Р±РёРЅРґР° |
+| `ZAI_BACKEND_URL` | `https://autoglm-api.autoglm.ai/autoclaw-proxy/proxy/autoclaw/chat/completions` | URL Р±СЌРєРµРЅРґР° z.ai |
+| `AUTOCLAW_REQ_HEADERS` / `JWT_PATH` | `~/.openclaw-autoclaw/request-headers.json` | РџСѓС‚СЊ Рє С„Р°Р№Р»Сѓ СЃ JWT |
+| `PROXY_API_KEY` / `API_KEY` | *(РїСѓСЃС‚Рѕ)* | Р•СЃР»Рё Р·Р°РґР°РЅ вЂ” Р·Р°С‰РёС‚Р° РІСЃРµС… СЌРЅРґРїРѕРёРЅС‚РѕРІ РєСЂРѕРјРµ `/health` Рё `/` |
+| `LOG` / `LOG_LEVEL` | `info` | РЈСЂРѕРІРµРЅСЊ Р»РѕРіРѕРІ: `debug`, `info`, `error` |
+| `LOG_JSON` | `false` | `1` вЂ” JSON-Р»РѕРіРё РґР»СЏ Loki / Datadog |
+| `BODY_LIMIT_BYTES` | `10485760` (10 РњР‘) | Р›РёРјРёС‚ С‚РµР»Р° Р·Р°РїСЂРѕСЃР° (РѕС‚ 1 РљР‘ РґРѕ 100 РњР‘) |
+| `BACKEND_TIMEOUT_MS` | `120000` | РўР°Р№РјР°СѓС‚ Р±СЌРєРµРЅРґР° РІ РјСЃ, `0` вЂ” Р±РµР· С‚Р°Р№РјР°СѓС‚Р° |
+| `BACKEND_MAX_RETRIES` | `3` | РљРѕР»РёС‡РµСЃС‚РІРѕ РїРѕРїС‹С‚РѕРє РїСЂРё `429 / 5xx / СЃРµС‚РµРІРѕРј СЃР±РѕРµ` |
+| `BACKEND_RETRY_BASE_MS` | `400` | Р‘Р°Р·Р° РґР»СЏ СЌРєСЃРїРѕРЅРµРЅС†РёР°Р»СЊРЅРѕРіРѕ backoff |
+| `CORS_ALLOW_ORIGIN` | `*` | Р—Р°РіРѕР»РѕРІРѕРє `Access-Control-Allow-Origin` |
+| `HEALTH_DETAILS` | `true` | РџРѕРєР°Р·С‹РІР°С‚СЊ Р»Рё РґРµС‚Р°Р»Рё РІ `/health` |
+| `MODEL_MAP_JSON` | *(РїСѓСЃС‚Рѕ)* | JSON РґР»СЏ СЂР°СЃС€РёСЂРµРЅРёСЏ РјР°РїС‹ РјРѕРґРµР»РµР№, РЅР°РїСЂРёРјРµСЂ `'{"my-glm":"zai_custom"}'` |
 
 <details>
-<summary>Пример файла <code>.env</code></summary>
+<summary>РџСЂРёРјРµСЂ С„Р°Р№Р»Р° <code>.env</code></summary>
 
 ```env
 PORT=18888
 HOST=127.0.0.1
 ZAI_BACKEND_URL=https://autoglm-api.autoglm.ai/autoclaw-proxy/proxy/autoclaw/chat/completions
-PROXY_API_KEY=sk-proj-твой-секретный-ключ
+PROXY_API_KEY=sk-proj-С‚РІРѕР№-СЃРµРєСЂРµС‚РЅС‹Р№-РєР»СЋС‡
 LOG=info
 LOG_JSON=false
 BODY_LIMIT_BYTES=10485760
@@ -276,7 +276,7 @@ MODEL_MAP_JSON={"my-model":"zai_auto"}
 
 ---
 
-## Модели
+## РњРѕРґРµР»Рё
 
 <div align="center">
 
@@ -284,21 +284,21 @@ MODEL_MAP_JSON={"my-model":"zai_auto"}
 
 </div>
 
-### Базовая мапа
+### Р‘Р°Р·РѕРІР°СЏ РјР°РїР°
 
-| ID для клиента | Бэкенд ID | Назначение |
+| ID РґР»СЏ РєР»РёРµРЅС‚Р° | Р‘СЌРєРµРЅРґ ID | РќР°Р·РЅР°С‡РµРЅРёРµ |
 |---|---|---|
-| `auto` | `zai_auto` | Авто-выбор оптимальной модели |
-| `glm-5-turbo` | `zai_glm-5-turbo` | Быстрый GLM-5, низкая задержка |
-| `glm-5.3` | `zaicoding_glm-5.3` | Флагман — код, рассуждения, инструменты |
-| `glm-5.3-flash` | `zai_glm-5.3-flash` | Экономный GLM-5.3 |
-| `glm-coding` | `zaicoding_glm-5.3` | Алиас для задач кодинга |
-| `zaicoding-glm-5.3` | `zaicoding_glm-5.3` | Прямой ID |
-| `deepseek-v4-flash-202605` | `zai_auto` | Совместимость |
+| `auto` | `zai_auto` | РђРІС‚Рѕ-РІС‹Р±РѕСЂ РѕРїС‚РёРјР°Р»СЊРЅРѕР№ РјРѕРґРµР»Рё |
+| `glm-5-turbo` | `zai_glm-5-turbo` | Р‘С‹СЃС‚СЂС‹Р№ GLM-5, РЅРёР·РєР°СЏ Р·Р°РґРµСЂР¶РєР° |
+| `glm-5.3` | `zaicoding_glm-5.3` | Р¤Р»Р°РіРјР°РЅ вЂ” РєРѕРґ, СЂР°СЃСЃСѓР¶РґРµРЅРёСЏ, РёРЅСЃС‚СЂСѓРјРµРЅС‚С‹ |
+| `glm-5.3-flash` | `zai_glm-5.3-flash` | Р­РєРѕРЅРѕРјРЅС‹Р№ GLM-5.3 |
+| `glm-coding` | `zaicoding_glm-5.3` | РђР»РёР°СЃ РґР»СЏ Р·Р°РґР°С‡ РєРѕРґРёРЅРіР° |
+| `zaicoding-glm-5.3` | `zaicoding_glm-5.3` | РџСЂСЏРјРѕР№ ID |
+| `deepseek-v4-flash-202605` | `zai_auto` | РЎРѕРІРјРµСЃС‚РёРјРѕСЃС‚СЊ |
 
-### Claude-алиасы — в GLM-5.3
+### Claude-Р°Р»РёР°СЃС‹ вЂ” РІ GLM-5.3
 
-Любой `claude-*` автоматически становится `zaicoding_glm-5.3`:
+Р›СЋР±РѕР№ `claude-*` Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё СЃС‚Р°РЅРѕРІРёС‚СЃСЏ `zaicoding_glm-5.3`:
 
 ```
 claude-sonnet-4-5
@@ -307,25 +307,25 @@ claude-opus-4-1 / claude-opus-4-5
 claude-haiku-4-5
 claude-3-5-sonnet-20241022
 claude-3-opus-20240229
-…и любой другой claude-* (регулярка ^claude)
+вЂ¦Рё Р»СЋР±РѕР№ РґСЂСѓРіРѕР№ claude-* (СЂРµРіСѓР»СЏСЂРєР° ^claude)
 ```
 
-### Эвристики
+### Р­РІСЂРёСЃС‚РёРєРё
 
-| Что написал | Куда уйдет |
+| Р§С‚Рѕ РЅР°РїРёСЃР°Р» | РљСѓРґР° СѓР№РґРµС‚ |
 |---|---|
-| содержит `glm-5.3` / `glm-5` | `zaicoding_glm-5.3` (или `flash` / `turbo` если есть слово) |
-| содержит `glm-coding` / `coding` | `zaicoding_glm-5.3` |
-| содержит `deepseek` / `auto` | `zai_auto` |
-| все остальное | `zai_glm-5.3-flash` (дефолт) |
+| СЃРѕРґРµСЂР¶РёС‚ `glm-5.3` / `glm-5` | `zaicoding_glm-5.3` (РёР»Рё `flash` / `turbo` РµСЃР»Рё РµСЃС‚СЊ СЃР»РѕРІРѕ) |
+| СЃРѕРґРµСЂР¶РёС‚ `glm-coding` / `coding` | `zaicoding_glm-5.3` |
+| СЃРѕРґРµСЂР¶РёС‚ `deepseek` / `auto` | `zai_auto` |
+| РІСЃРµ РѕСЃС‚Р°Р»СЊРЅРѕРµ | `zai_glm-5.3-flash` (РґРµС„РѕР»С‚) |
 
-### Кастомная мапа
+### РљР°СЃС‚РѕРјРЅР°СЏ РјР°РїР°
 
 ```bash
 MODEL_MAP_JSON='{"my-fast":"zai_glm-5-turbo","my-smart":"zaicoding_glm-5.3"}' npm start
 ```
 
-После этого новые ID сразу появятся в `GET /v1/models`.
+РџРѕСЃР»Рµ СЌС‚РѕРіРѕ РЅРѕРІС‹Рµ ID СЃСЂР°Р·Сѓ РїРѕСЏРІСЏС‚СЃСЏ РІ `GET /v1/models`.
 
 ---
 
@@ -333,25 +333,25 @@ MODEL_MAP_JSON='{"my-fast":"zai_glm-5-turbo","my-smart":"zaicoding_glm-5.3"}' np
 
 <div align="center">
 
-| Метод | Путь | Описание | Аутентификация |
+| РњРµС‚РѕРґ | РџСѓС‚СЊ | РћРїРёСЃР°РЅРёРµ | РђСѓС‚РµРЅС‚РёС„РёРєР°С†РёСЏ |
 |---|---|---|---|
-| `GET` | `/` | Информация о прокси и список эндпоинтов | нет |
-| `GET` | `/health`, `/v1/health`, `/ping` | Здоровье, детали, память | нет |
-| `GET` | `/v1/models` | Список моделей в формате OpenAI | да |
-| `POST` | `/v1/chat/completions` | Чат, совместимый с OpenAI | да |
-| `POST` | `/v1/messages` | Чат, совместимый с Anthropic | да |
+| `GET` | `/` | РРЅС„РѕСЂРјР°С†РёСЏ Рѕ РїСЂРѕРєСЃРё Рё СЃРїРёСЃРѕРє СЌРЅРґРїРѕРёРЅС‚РѕРІ | РЅРµС‚ |
+| `GET` | `/health`, `/v1/health`, `/ping` | Р—РґРѕСЂРѕРІСЊРµ, РґРµС‚Р°Р»Рё, РїР°РјСЏС‚СЊ | РЅРµС‚ |
+| `GET` | `/v1/models` | РЎРїРёСЃРѕРє РјРѕРґРµР»РµР№ РІ С„РѕСЂРјР°С‚Рµ OpenAI | РґР° |
+| `POST` | `/v1/chat/completions` | Р§Р°С‚, СЃРѕРІРјРµСЃС‚РёРјС‹Р№ СЃ OpenAI | РґР° |
+| `POST` | `/v1/messages` | Р§Р°С‚, СЃРѕРІРјРµСЃС‚РёРјС‹Р№ СЃ Anthropic | РґР° |
 
-<sub>«да» — требует заголовок <code>Authorization: Bearer &lt;PROXY_API_KEY&gt;</code> если ключ задан. Также принимаются <code>X-Api-Key</code>, <code>X-Authorization</code>, <code>?api_key=</code></sub>
+<sub>В«РґР°В» вЂ” С‚СЂРµР±СѓРµС‚ Р·Р°РіРѕР»РѕРІРѕРє <code>Authorization: Bearer &lt;PROXY_API_KEY&gt;</code> РµСЃР»Рё РєР»СЋС‡ Р·Р°РґР°РЅ. РўР°РєР¶Рµ РїСЂРёРЅРёРјР°СЋС‚СЃСЏ <code>X-Api-Key</code>, <code>X-Authorization</code>, <code>?api_key=</code></sub>
 
 </div>
 
-### Заголовки бэкенда
+### Р—Р°РіРѕР»РѕРІРєРё Р±СЌРєРµРЅРґР°
 
-Каждый запрос к `ZAI_BACKEND_URL` автоматически получает:
+РљР°Р¶РґС‹Р№ Р·Р°РїСЂРѕСЃ Рє `ZAI_BACKEND_URL` Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё РїРѕР»СѓС‡Р°РµС‚:
 
 ```
 Authorization: Bearer autoclaw-internal-proxy
-X-Authorization: <JWT из файла>
+X-Authorization: <JWT РёР· С„Р°Р№Р»Р°>
 X-Request-Id: <uuid>
 X-Request-Model: <backendModel>
 X-Client-Type: pc
@@ -364,22 +364,22 @@ X-Channel: official
 x_trace_id: autoclaw-desktop
 ```
 
-### Коды ошибок
+### РљРѕРґС‹ РѕС€РёР±РѕРє
 
-| Код | Когда |
+| РљРѕРґ | РљРѕРіРґР° |
 |---|---|
-| `400` | Невалидный JSON, пустые `messages`, неверная роль |
-| `401` | Неверный `PROXY_API_KEY` |
-| `405` | Не тот HTTP-метод |
-| `413` | Тело больше `BODY_LIMIT_BYTES` |
-| `502` | Бэкенд вернул не-JSON или сетевой сбой |
-| `504` | Таймаут бэкенда |
+| `400` | РќРµРІР°Р»РёРґРЅС‹Р№ JSON, РїСѓСЃС‚С‹Рµ `messages`, РЅРµРІРµСЂРЅР°СЏ СЂРѕР»СЊ |
+| `401` | РќРµРІРµСЂРЅС‹Р№ `PROXY_API_KEY` |
+| `405` | РќРµ С‚РѕС‚ HTTP-РјРµС‚РѕРґ |
+| `413` | РўРµР»Рѕ Р±РѕР»СЊС€Рµ `BODY_LIMIT_BYTES` |
+| `502` | Р‘СЌРєРµРЅРґ РІРµСЂРЅСѓР» РЅРµ-JSON РёР»Рё СЃРµС‚РµРІРѕР№ СЃР±РѕР№ |
+| `504` | РўР°Р№РјР°СѓС‚ Р±СЌРєРµРЅРґР° |
 
 ---
 
-## Примеры
+## РџСЂРёРјРµСЂС‹
 
-### OpenAI — обычный запрос
+### OpenAI вЂ” РѕР±С‹С‡РЅС‹Р№ Р·Р°РїСЂРѕСЃ
 
 ```bash
 curl http://localhost:18888/v1/chat/completions \
@@ -389,13 +389,13 @@ curl http://localhost:18888/v1/chat/completions \
     "model": "glm-5.3",
     "temperature": 0.7,
     "messages": [
-      {"role": "system", "content": "Ты — полезный ассистент."},
-      {"role": "user", "content": "Напиши функцию Фибоначчи на Python"}
+      {"role": "system", "content": "РўС‹ вЂ” РїРѕР»РµР·РЅС‹Р№ Р°СЃСЃРёСЃС‚РµРЅС‚."},
+      {"role": "user", "content": "РќР°РїРёС€Рё С„СѓРЅРєС†РёСЋ Р¤РёР±РѕРЅР°С‡С‡Рё РЅР° Python"}
     ]
   }' | jq
 ```
 
-### OpenAI — поток (SSE)
+### OpenAI вЂ” РїРѕС‚РѕРє (SSE)
 
 ```bash
 curl -N http://localhost:18888/v1/chat/completions \
@@ -404,31 +404,31 @@ curl -N http://localhost:18888/v1/chat/completions \
     "model": "glm-5.3",
     "stream": true,
     "stream_options": {"include_usage": true},
-    "messages": [{"role":"user","content":"Расскажи про космос"}]
+    "messages": [{"role":"user","content":"Р Р°СЃСЃРєР°Р¶Рё РїСЂРѕ РєРѕСЃРјРѕСЃ"}]
   }'
 ```
 
 ```
-data: {"id":"chatcmpl-...","choices":[{"delta":{"content":"Космос"}}]}
-data: {"id":"chatcmpl-...","choices":[{"delta":{"content":" — это"}}]}
+data: {"id":"chatcmpl-...","choices":[{"delta":{"content":"РљРѕСЃРјРѕСЃ"}}]}
+data: {"id":"chatcmpl-...","choices":[{"delta":{"content":" вЂ” СЌС‚Рѕ"}}]}
 ...
 data: {"choices":[],"usage":{"prompt_tokens":10,"completion_tokens":120}}
 data: [DONE]
 ```
 
-### OpenAI — вызов инструментов
+### OpenAI вЂ” РІС‹Р·РѕРІ РёРЅСЃС‚СЂСѓРјРµРЅС‚РѕРІ
 
 ```bash
 curl http://localhost:18888/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
     "model": "glm-5.3",
-    "messages": [{"role":"user","content":"Какая погода в Москве?"}],
+    "messages": [{"role":"user","content":"РљР°РєР°СЏ РїРѕРіРѕРґР° РІ РњРѕСЃРєРІРµ?"}],
     "tools": [{
       "type": "function",
       "function": {
         "name": "get_weather",
-        "description": "Узнать погоду в городе",
+        "description": "РЈР·РЅР°С‚СЊ РїРѕРіРѕРґСѓ РІ РіРѕСЂРѕРґРµ",
         "parameters": {
           "type": "object",
           "properties": {"city": {"type":"string"}},
@@ -440,7 +440,7 @@ curl http://localhost:18888/v1/chat/completions \
   }' | jq
 ```
 
-### Anthropic — обычный запрос
+### Anthropic вЂ” РѕР±С‹С‡РЅС‹Р№ Р·Р°РїСЂРѕСЃ
 
 ```bash
 curl http://localhost:18888/v1/messages \
@@ -451,12 +451,12 @@ curl http://localhost:18888/v1/messages \
     "model": "claude-sonnet-4-5",
     "max_tokens": 1024,
     "messages": [
-      {"role":"user","content":"Привет! Объясни квантовую запутанность простыми словами."}
+      {"role":"user","content":"РџСЂРёРІРµС‚! РћР±СЉСЏСЃРЅРё РєРІР°РЅС‚РѕРІСѓСЋ Р·Р°РїСѓС‚Р°РЅРЅРѕСЃС‚СЊ РїСЂРѕСЃС‚С‹РјРё СЃР»РѕРІР°РјРё."}
     ]
   }' | jq
 ```
 
-### Anthropic — поток
+### Anthropic вЂ” РїРѕС‚РѕРє
 
 ```bash
 curl -N http://localhost:18888/v1/messages \
@@ -465,7 +465,7 @@ curl -N http://localhost:18888/v1/messages \
     "model": "claude-sonnet-4-5",
     "max_tokens": 2048,
     "stream": true,
-    "messages": [{"role":"user","content":"Напиши рассказ про робота"}]
+    "messages": [{"role":"user","content":"РќР°РїРёС€Рё СЂР°СЃСЃРєР°Р· РїСЂРѕ СЂРѕР±РѕС‚Р°"}]
   }'
 ```
 
@@ -477,7 +477,7 @@ event: content_block_start
 data: {"type":"content_block_start","index":0,"content_block":{"type":"text","text":""}}
 
 event: content_block_delta
-data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"Жил-был"}}
+data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"Р–РёР»-Р±С‹Р»"}}
 
 event: message_delta
 data: {"type":"message_delta","delta":{"stop_reason":"end_turn"}}
@@ -486,7 +486,7 @@ event: message_stop
 data: {"type":"message_stop"}
 ```
 
-### Anthropic — tool_use (Claude Code)
+### Anthropic вЂ” tool_use (Claude Code)
 
 ```bash
 curl http://localhost:18888/v1/messages \
@@ -494,10 +494,10 @@ curl http://localhost:18888/v1/messages \
   -d '{
     "model": "claude-sonnet-4-5",
     "max_tokens": 2048,
-    "messages": [{"role":"user","content":"Создай файл hello.py с приветствием"}],
+    "messages": [{"role":"user","content":"РЎРѕР·РґР°Р№ С„Р°Р№Р» hello.py СЃ РїСЂРёРІРµС‚СЃС‚РІРёРµРј"}],
     "tools": [{
       "name": "write_file",
-      "description": "Записать файл",
+      "description": "Р—Р°РїРёСЃР°С‚СЊ С„Р°Р№Р»",
       "input_schema": {
         "type":"object",
         "properties": {
@@ -517,12 +517,12 @@ from openai import OpenAI
 
 client = OpenAI(
     base_url="http://localhost:18888/v1",
-    api_key="неважно-если-PROXY_API_KEY-не-задан",
+    api_key="РЅРµРІР°Р¶РЅРѕ-РµСЃР»Рё-PROXY_API_KEY-РЅРµ-Р·Р°РґР°РЅ",
 )
 
 stream = client.chat.completions.create(
     model="glm-5.3",
-    messages=[{"role": "user", "content": "Привет!"}],
+    messages=[{"role": "user", "content": "РџСЂРёРІРµС‚!"}],
     stream=True,
 )
 
@@ -544,7 +544,7 @@ client = anthropic.Anthropic(
 with client.messages.stream(
     model="claude-sonnet-4-5",
     max_tokens=1024,
-    messages=[{"role": "user", "content": "Привет!"}],
+    messages=[{"role": "user", "content": "РџСЂРёРІРµС‚!"}],
 ) as stream:
     for text in stream.text_stream:
         print(text, end="", flush=True)
@@ -553,20 +553,20 @@ with client.messages.stream(
 ### Claude Code
 
 ```bash
-# переменные окружения
+# РїРµСЂРµРјРµРЅРЅС‹Рµ РѕРєСЂСѓР¶РµРЅРёСЏ
 export ANTHROPIC_BASE_URL=http://localhost:18888
 export ANTHROPIC_API_KEY=dummy
-# или
+# РёР»Рё
 export ANTHROPIC_AUTH_TOKEN=dummy
 
-claude --model claude-sonnet-4-5 "объясни этот код"
+claude --model claude-sonnet-4-5 "РѕР±СЉСЏСЃРЅРё СЌС‚РѕС‚ РєРѕРґ"
 ```
 
-> Прокси автоматически смапит `claude-sonnet-4-5` в `zaicoding_glm-5.3`, конвертирует `tool_use` в `tool_calls`, `thinking` в `reasoning_content`, картинки `base64/url`, документы и `tool_result`.
+> РџСЂРѕРєСЃРё Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё СЃРјР°РїРёС‚ `claude-sonnet-4-5` РІ `zaicoding_glm-5.3`, РєРѕРЅРІРµСЂС‚РёСЂСѓРµС‚ `tool_use` РІ `tool_calls`, `thinking` РІ `reasoning_content`, РєР°СЂС‚РёРЅРєРё `base64/url`, РґРѕРєСѓРјРµРЅС‚С‹ Рё `tool_result`.
 
 ---
 
-## Claude Code — полная совместимость
+## Claude Code вЂ” РїРѕР»РЅР°СЏ СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚СЊ
 
 <div align="center">
 
@@ -576,32 +576,32 @@ claude --model claude-sonnet-4-5 "объясни этот код"
 
 ---
 
-## Структура проекта
+## РЎС‚СЂСѓРєС‚СѓСЂР° РїСЂРѕРµРєС‚Р°
 
 ```
 zai-proxy/
-├── src/
-│   ├── index.ts              # точка входа, graceful shutdown, сигналы
-│   ├── server.ts             # HTTP-сервер, CORS, аутентификация, роутинг
-│   ├── config.ts             # загрузка и валидация переменных окружения
-│   ├── auth.ts               # JWT-кэш по mtime/size, cooldown 50 мс
-│   ├── backend.ts            # fetch с ретраями, Retry-After, backoff и jitter
-│   ├── models.ts             # MODEL_MAP, resolveModel, эвристики
-│   ├── handlers/
-│   │   ├── openai.ts         # /v1/chat/completions, SSE, heartbeat
-│   │   └── anthropic.ts      # /v1/messages, валидация, конвертация
-│   ├── convert/
-│   │   ├── anthropic-to-openai.ts   # система, картинки, тулзы → OpenAI
-│   │   └── openai-to-anthropic.ts   # чанки, usage, thinking → Anthropic SSE
-│   ├── types/
-│   │   ├── openai.ts
-│   │   └── anthropic.ts
-│   └── utils/
-│       ├── sse.ts            # sseEncode, sseDone
-│       └── logger.ts         # уровни логов и JSON-формат
-├── dist/                     # сборка (tsc)
-├── package.json
-└── tsconfig.json
+в”њв”Ђв”Ђ src/
+в”‚   в”њв”Ђв”Ђ index.ts              # С‚РѕС‡РєР° РІС…РѕРґР°, graceful shutdown, СЃРёРіРЅР°Р»С‹
+в”‚   в”њв”Ђв”Ђ server.ts             # HTTP-СЃРµСЂРІРµСЂ, CORS, Р°СѓС‚РµРЅС‚РёС„РёРєР°С†РёСЏ, СЂРѕСѓС‚РёРЅРі
+в”‚   в”њв”Ђв”Ђ config.ts             # Р·Р°РіСЂСѓР·РєР° Рё РІР°Р»РёРґР°С†РёСЏ РїРµСЂРµРјРµРЅРЅС‹С… РѕРєСЂСѓР¶РµРЅРёСЏ
+в”‚   в”њв”Ђв”Ђ auth.ts               # JWT-РєСЌС€ РїРѕ mtime/size, cooldown 50 РјСЃ
+в”‚   в”њв”Ђв”Ђ backend.ts            # fetch СЃ СЂРµС‚СЂР°СЏРјРё, Retry-After, backoff Рё jitter
+в”‚   в”њв”Ђв”Ђ models.ts             # MODEL_MAP, resolveModel, СЌРІСЂРёСЃС‚РёРєРё
+в”‚   в”њв”Ђв”Ђ handlers/
+в”‚   в”‚   в”њв”Ђв”Ђ openai.ts         # /v1/chat/completions, SSE, heartbeat
+в”‚   в”‚   в””в”Ђв”Ђ anthropic.ts      # /v1/messages, РІР°Р»РёРґР°С†РёСЏ, РєРѕРЅРІРµСЂС‚Р°С†РёСЏ
+в”‚   в”њв”Ђв”Ђ convert/
+в”‚   в”‚   в”њв”Ђв”Ђ anthropic-to-openai.ts   # СЃРёСЃС‚РµРјР°, РєР°СЂС‚РёРЅРєРё, С‚СѓР»Р·С‹ в†’ OpenAI
+в”‚   в”‚   в””в”Ђв”Ђ openai-to-anthropic.ts   # С‡Р°РЅРєРё, usage, thinking в†’ Anthropic SSE
+в”‚   в”њв”Ђв”Ђ types/
+в”‚   в”‚   в”њв”Ђв”Ђ openai.ts
+в”‚   в”‚   в””в”Ђв”Ђ anthropic.ts
+в”‚   в””в”Ђв”Ђ utils/
+в”‚       в”њв”Ђв”Ђ sse.ts            # sseEncode, sseDone
+в”‚       в””в”Ђв”Ђ logger.ts         # СѓСЂРѕРІРЅРё Р»РѕРіРѕРІ Рё JSON-С„РѕСЂРјР°С‚
+в”њв”Ђв”Ђ dist/                     # СЃР±РѕСЂРєР° (tsc)
+в”њв”Ђв”Ђ package.json
+в””в”Ђв”Ђ tsconfig.json
 ```
 
 ---
@@ -629,64 +629,64 @@ docker run -p 18888:18888 \
 
 ---
 
-## Частые вопросы
+## Р§Р°СЃС‚С‹Рµ РІРѕРїСЂРѕСЃС‹
 
 <details>
-<summary>Зачем нужен прокси, если можно вызывать z.ai напрямую</summary>
+<summary>Р—Р°С‡РµРј РЅСѓР¶РµРЅ РїСЂРѕРєСЃРё, РµСЃР»Рё РјРѕР¶РЅРѕ РІС‹Р·С‹РІР°С‚СЊ z.ai РЅР°РїСЂСЏРјСѓСЋ</summary>
 
-z.ai говорит на своем диалекте. Клиенты вроде Claude Code или OpenAI SDK — на своем. Прокси выступает переводчиком и не требует менять клиентский код.
+z.ai РіРѕРІРѕСЂРёС‚ РЅР° СЃРІРѕРµРј РґРёР°Р»РµРєС‚Рµ. РљР»РёРµРЅС‚С‹ РІСЂРѕРґРµ Claude Code РёР»Рё OpenAI SDK вЂ” РЅР° СЃРІРѕРµРј. РџСЂРѕРєСЃРё РІС‹СЃС‚СѓРїР°РµС‚ РїРµСЂРµРІРѕРґС‡РёРєРѕРј Рё РЅРµ С‚СЂРµР±СѓРµС‚ РјРµРЅСЏС‚СЊ РєР»РёРµРЅС‚СЃРєРёР№ РєРѕРґ.
 
 </details>
 
 <details>
-<summary>Нужен ли ключ OpenAI или Anthropic</summary>
+<summary>РќСѓР¶РµРЅ Р»Рё РєР»СЋС‡ OpenAI РёР»Рё Anthropic</summary>
 
-Нет. Достаточно JWT из `request-headers.json`. Если `PROXY_API_KEY` не задан — прокси открыт локально. Если задан — укажи его как `Authorization: Bearer ...` в клиенте.
-
-</details>
-
-<details>
-<summary>Поток прерывается через минуту</summary>
-
-Проверь, что `BACKEND_TIMEOUT_MS` достаточно большой (по умолчанию 120 секунд). Для длинных генераций поставь `0` (без таймаута). Heartbeat каждые 15 секунд уже удерживает соединение.
+РќРµС‚. Р”РѕСЃС‚Р°С‚РѕС‡РЅРѕ JWT РёР· `request-headers.json`. Р•СЃР»Рё `PROXY_API_KEY` РЅРµ Р·Р°РґР°РЅ вЂ” РїСЂРѕРєСЃРё РѕС‚РєСЂС‹С‚ Р»РѕРєР°Р»СЊРЅРѕ. Р•СЃР»Рё Р·Р°РґР°РЅ вЂ” СѓРєР°Р¶Рё РµРіРѕ РєР°Рє `Authorization: Bearer ...` РІ РєР»РёРµРЅС‚Рµ.
 
 </details>
 
 <details>
-<summary>Как добавить свою модель</summary>
+<summary>РџРѕС‚РѕРє РїСЂРµСЂС‹РІР°РµС‚СЃСЏ С‡РµСЂРµР· РјРёРЅСѓС‚Сѓ</summary>
+
+РџСЂРѕРІРµСЂСЊ, С‡С‚Рѕ `BACKEND_TIMEOUT_MS` РґРѕСЃС‚Р°С‚РѕС‡РЅРѕ Р±РѕР»СЊС€РѕР№ (РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ 120 СЃРµРєСѓРЅРґ). Р”Р»СЏ РґР»РёРЅРЅС‹С… РіРµРЅРµСЂР°С†РёР№ РїРѕСЃС‚Р°РІСЊ `0` (Р±РµР· С‚Р°Р№РјР°СѓС‚Р°). Heartbeat РєР°Р¶РґС‹Рµ 15 СЃРµРєСѓРЅРґ СѓР¶Рµ СѓРґРµСЂР¶РёРІР°РµС‚ СЃРѕРµРґРёРЅРµРЅРёРµ.
+
+</details>
+
+<details>
+<summary>РљР°Рє РґРѕР±Р°РІРёС‚СЊ СЃРІРѕСЋ РјРѕРґРµР»СЊ</summary>
 
 ```bash
 MODEL_MAP_JSON='{"my-model":"zai_custom_backend_id"}' npm start
 ```
 
-Она сразу появится в `GET /v1/models`.
+РћРЅР° СЃСЂР°Р·Сѓ РїРѕСЏРІРёС‚СЃСЏ РІ `GET /v1/models`.
 
 </details>
 
 <details>
-<summary>Где посмотреть логи</summary>
+<summary>Р“РґРµ РїРѕСЃРјРѕС‚СЂРµС‚СЊ Р»РѕРіРё</summary>
 
-В stdout. `LOG=debug` — подробно, `LOG_JSON=1` — JSON для агрегаторов. В каждом ответе есть `X-Request-Id` для трейсинга.
+Р’ stdout. `LOG=debug` вЂ” РїРѕРґСЂРѕР±РЅРѕ, `LOG_JSON=1` вЂ” JSON РґР»СЏ Р°РіСЂРµРіР°С‚РѕСЂРѕРІ. Р’ РєР°Р¶РґРѕРј РѕС‚РІРµС‚Рµ РµСЃС‚СЊ `X-Request-Id` РґР»СЏ С‚СЂРµР№СЃРёРЅРіР°.
 
 </details>
 
 ---
 
-## Скрипты
+## РЎРєСЂРёРїС‚С‹
 
-| Команда | Что делает |
+| РљРѕРјР°РЅРґР° | Р§С‚Рѕ РґРµР»Р°РµС‚ |
 |---|---|
-| `npm run dev` | Запуск с автоперезапуском (`tsx watch`) |
-| `npm run build` | Компиляция `tsc` в `dist/` |
-| `npm start` | Запуск собранного `dist/index.js` |
-| `npm run typecheck` | Проверка типов без сборки |
-| `npm run clean` | Удаление `dist/` |
+| `npm run dev` | Р—Р°РїСѓСЃРє СЃ Р°РІС‚РѕРїРµСЂРµР·Р°РїСѓСЃРєРѕРј (`tsx watch`) |
+| `npm run build` | РљРѕРјРїРёР»СЏС†РёСЏ `tsc` РІ `dist/` |
+| `npm start` | Р—Р°РїСѓСЃРє СЃРѕР±СЂР°РЅРЅРѕРіРѕ `dist/index.js` |
+| `npm run typecheck` | РџСЂРѕРІРµСЂРєР° С‚РёРїРѕРІ Р±РµР· СЃР±РѕСЂРєРё |
+| `npm run clean` | РЈРґР°Р»РµРЅРёРµ `dist/` |
 
 ---
 
-## Лицензия
+## Р›РёС†РµРЅР·РёСЏ
 
-**MIT** — можно использовать как угодно, сохраняя уведомление об авторских правах.
+**MIT** вЂ” РјРѕР¶РЅРѕ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РєР°Рє СѓРіРѕРґРЅРѕ, СЃРѕС…СЂР°РЅСЏСЏ СѓРІРµРґРѕРјР»РµРЅРёРµ РѕР± Р°РІС‚РѕСЂСЃРєРёС… РїСЂР°РІР°С….
 
 ---
 
@@ -694,6 +694,6 @@ MODEL_MAP_JSON='{"my-model":"zai_custom_backend_id"}' npm start
 
 <img src="assets/footer.svg" alt="footer">
 
-<sub>Нашли ошибку в README или есть идея — открывайте Issue или Pull Request</sub>
+<sub>РќР°С€Р»Рё РѕС€РёР±РєСѓ РІ README РёР»Рё РµСЃС‚СЊ РёРґРµСЏ вЂ” РѕС‚РєСЂС‹РІР°Р№С‚Рµ Issue РёР»Рё Pull Request</sub>
 
 </div>
