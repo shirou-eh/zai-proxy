@@ -1,3 +1,6 @@
+/**
+ * zai-proxy entrypoint: config, logger, server, graceful shutdown.
+ */
 import { loadConfig } from './config.js';
 import { Logger } from './utils/logger.js';
 import { createServer } from './server.js';
@@ -15,10 +18,11 @@ async function main(): Promise<void> {
   const logger = new Logger(config);
   const server = createServer(config, logger);
 
+  const displayHost = config.listenAddress === '::' ? 'localhost' : config.host;
   const onListening = (): void => {
     const map = getModelMapSnapshot();
     logger.info(
-      `zai-proxy v3.1.0 on http://${config.host}:${config.port} ` +
+      `zai-proxy v3.1.0 on http://${displayHost}:${config.port} (bind=${config.listenAddress}) ` +
         `backend=${config.backendUrl} ` +
         `models=${Object.keys(map).length} ` +
         `log=${config.logLevel}${config.logJson ? '+json' : ''} ` +
@@ -32,7 +36,7 @@ async function main(): Promise<void> {
     logger.info(`contract: autoclaw-request-contract-v1 (dynamic headers + session ids + body model rewrite + SDK transport headers)`);
   };
 
-  server.listen(config.port, config.host, onListening);
+  server.listen(config.port, config.listenAddress, onListening);
 
   server.on('error', (err: NodeJS.ErrnoException) => {
     if (err.code === 'EADDRINUSE') {

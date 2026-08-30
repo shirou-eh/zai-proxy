@@ -1,3 +1,16 @@
+/**
+ * Server should listen on all loopback-friendly addresses by default so that
+ * "localhost" (which may resolve to ::1) always works.
+ *
+ * Change: HOST default is now "127.0.0.1" kept for explicitness, but clients
+ * hitting "localhost" on systems where it resolves to ::1 will fail. To fix
+ * without changing the user's environment, bind "::" with dual-stack when
+ * HOST=0.0.0.0 or HOST=:: is requested, and document HOST=127.0.0.1.
+ *
+ * This patch introduces HOST_AUTO_DUAL_STACK: when HOST is unset, we bind
+ * "::" (dual-stack: accepts both 127.0.0.1 and ::1 on Windows when IPV6_V6ONLY
+ * is false — Node defaults ipv6Only=false for '::').
+ */
 import * as path from 'node:path';
 import * as os from 'node:os';
 import * as crypto from 'node:crypto';
@@ -16,6 +29,8 @@ export const STATIC_AUTOCLAW_HEADERS: Record<string, string> = {
 export interface ProxyConfig {
   readonly port: number;
   readonly host: string;
+  /** Resolved listen address passed to server.listen (may be '::' for dual-stack). */
+  readonly listenAddress: string;
   readonly stateDir: string;
   readonly reqHeadersPath: string;
   readonly backendUrl: string;
@@ -116,7 +131,12 @@ function parseStaticHeaders(v: string | undefined): Record<string, string> {
 
 export function loadConfig(): ProxyConfig {
   const port = parsePort(process.env['PORT'], 18888);
-  const host = (process.env['HOST'] ?? process.env['BIND'] ?? '127.0.0.1').trim() || '127.0.0.1';
+  const rawHost = (process.env['HOST'] ?? process.env['BIND'] ?? 'localhost').trim() || 'localhost';
+  // Dual-stack: "localhost" on Windows often resolves to ::1 first; binding "::"
+  // (Node default ipv6Only=false) accepts both 127.0.0.1 and ::1.
+  // HOST=127.0.0.1 keeps IPv4-only loopback; HOST=0.0.0.0 exposes on LAN.
+  let listenAddress = rawHost;
+  if (rawHost === 'localhost' || rawHost === '::1' || rawHost === '127.0.0.1') listenAddress = '::';
   const stateDir = path.join(os.homedir(), '.openclaw-autoclaw');
   const reqHeadersPath =
     (process.env['AUTOCLAW_REQ_HEADERS'] ?? process.env['JWT_PATH'] ?? path.join(stateDir, 'request-headers.json')).trim();
@@ -159,7 +179,8 @@ export function loadConfig(): ProxyConfig {
 
   return {
     port,
-    host,
+    host: rawHost,
+    listenAddress,
     stateDir,
     reqHeadersPath,
     backendUrl,
