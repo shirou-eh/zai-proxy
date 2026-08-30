@@ -53,7 +53,7 @@ const REQUIRED_CONTRACT_HEADERS: Array<[string, string | RegExp]> = [
   ['user-agent', /^OpenAI\/JS 6\.39\.1$/],
   ['x-stainless-lang', 'js'],
   ['x-stainless-package-version', '6.39.1'],
-  ['x-stainless-os', 'Windows'],
+  ['x-stainless-os', process.platform === 'darwin' ? 'macOS' : process.platform === 'win32' ? 'Windows' : 'Linux'] as string,
   ['x-stainless-arch', 'x64'],
   ['x-stainless-runtime', 'node'],
   ['x-stainless-runtime-version', /^v\d+\.\d+\.\d+$/],

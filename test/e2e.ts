@@ -20,6 +20,9 @@ let backup: string | null = null;
 try {
   backup = fs.readFileSync(reqHeadersPath, 'utf8');
 } catch {}
+try {
+  fs.mkdirSync(stateDir, { recursive: true });
+} catch {}
 fs.writeFileSync(reqHeadersPath, JSON.stringify({ headers: { 'X-Authorization': FAKE_JWT, 'X-Client-Type': 'pc' } }), 'utf8');
 
 process.env['PORT'] = String(PROXY_PORT);
