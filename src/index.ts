@@ -18,15 +18,18 @@ async function main(): Promise<void> {
   const onListening = (): void => {
     const map = getModelMapSnapshot();
     logger.info(
-      `zai-proxy v2.1.0 on http://${config.host}:${config.port} ` +
+      `zai-proxy v3.0.0 on http://${config.host}:${config.port} ` +
         `backend=${config.backendUrl} ` +
         `models=${Object.keys(map).length} ` +
         `log=${config.logLevel}${config.logJson ? '+json' : ''} ` +
         `auth=${config.proxyApiKey ? 'enabled' : 'disabled'} ` +
         `limit=${(config.bodyLimitBytes / 1024 / 1024).toFixed(1)}MB ` +
-        `timeout=${config.backendTimeoutMs}ms retries=${config.backendMaxRetries}`,
+        `timeout=${config.backendTimeoutMs}ms retries=${config.backendMaxRetries} ` +
+        `upstreamStream=${config.forceUpstreamStream ? 'always' : 'on-demand'} ` +
+        `origin=${config.originMode} agent=${config.agentId}`,
     );
     logger.info(`endpoints: /health /v1/models /v1/chat/completions /v1/messages`);
+    logger.info(`contract: autoclaw-request-contract-v1 (dynamic headers + session ids + body model rewrite + SDK transport headers)`);
   };
 
   server.listen(config.port, config.host, onListening);
@@ -46,7 +49,6 @@ async function main(): Promise<void> {
     if (shuttingDown) return;
     shuttingDown = true;
     logger.info(`${signal} received — graceful shutdown (5s drain, 10s hard)`);
-    // Stop accepting new connections
     server.close((err) => {
       if (err) {
         console.error('shutdown error', err);
@@ -55,10 +57,8 @@ async function main(): Promise<void> {
       logger.info('all connections drained, exiting');
       process.exit(0);
     });
-    // Force close keep-alive after 5s
     setTimeout(() => {
       try {
-        // @ts-ignore — closeAllConnections exists Node 18.2+
         if (typeof (server as unknown as { closeAllConnections?: () => void }).closeAllConnections === 'function') {
           (server as unknown as { closeAllConnections: () => void }).closeAllConnections();
         }
@@ -80,7 +80,6 @@ async function main(): Promise<void> {
   });
   process.on('uncaughtException', (err) => {
     console.error('uncaughtException', err);
-    // keep process alive for serving requests unless it's fatal config error
   });
 }
 

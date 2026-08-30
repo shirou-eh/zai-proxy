@@ -1,6 +1,9 @@
 /**
- * Model routing — maps client-facing model ids → backend model ids.
- * Совместимость 100% с оригиналом + Claude Code aliases.
+ * Model routing — maps client-facing model ids to real AutoClaw backend model ids
+ * (as configured in the desktop client's openclaw.json providers.zai.models[]).
+ *
+ * Body model is rewritten without vendor prefix at the transport layer
+ * (zaicoding_glm-5.3 -> glm-5.3, see contract.ts applyContractBodyRewrite).
  */
 
 export const MODEL_MAP = {
@@ -10,7 +13,10 @@ export const MODEL_MAP = {
   'glm-5.3-flash': 'zai_glm-5.3-flash',
   'glm-coding': 'zaicoding_glm-5.3',
   'zaicoding-glm-5.3': 'zaicoding_glm-5.3',
-  'deepseek-v4-flash-202605': 'zai_auto',
+  'deepseek-v4-flash': 'tdpsk_deepseek-v4-flash-202605',
+  'deepseek-v4-flash-202605': 'tdpsk_deepseek-v4-flash-202605',
+  'deepseek-v4-pro': 'tdpsk_deepseek-v4-pro-202606',
+  'deepseek-v4-pro-202606': 'tdpsk_deepseek-v4-pro-202606',
 } as const;
 
 export type ClientModelId = keyof typeof MODEL_MAP;
@@ -19,8 +25,8 @@ export type BackendModelId = (typeof MODEL_MAP)[ClientModelId];
 export const DEFAULT_BACKEND_MODEL: BackendModelId = 'zai_glm-5.3-flash';
 
 /**
- * Claude aliases → за основу берём самый сильный glm (sonnet 4.5 / opus 4.1).
- * Покрывает Claude Code, Cline, Roo-Code и любые claude-* запросы.
+ * Claude aliases — real desktop client offers GLM-5.3 (sonnet tier) / GLM-5.3 (opus tier).
+ * Claude Code, Cline, Roo-Code send claude-* model ids.
  */
 const CLAUDE_PATTERN = /^claude(?:-3)?(?:[-.]?(?:sonnet|opus|haiku))?(?:[-.]?(?:4|3\.5|3))?(?:[-.]?(?:5|1))?/i;
 
@@ -38,10 +44,7 @@ const EXTRA_CLAUDE_MODELS: readonly string[] = [
   'claude-3-opus-20240229',
 ] as const;
 
-/**
- * Allow runtime extension via env MODEL_MAP_JSON='{"my-model":"zai_custom"}'
- * (мержится поверх встроенного мапа, полезно для локальных форков).
- */
+/** Allow runtime extension via env MODEL_MAP_JSON='{"my-model":"zai_custom"}'. */
 function getExtraModelMap(): Record<string, string> {
   const raw = process.env['MODEL_MAP_JSON'];
   if (!raw) return {};
@@ -81,7 +84,7 @@ export function resolveModel(raw: unknown): BackendModelId {
 
   const lower = m.toLowerCase();
 
-  // Exact lower-case fallback (e.g. GLM-5.3 → zaicoding_glm-5.3)
+  // Exact lower-case fallback (e.g. GLM-5.3 -> zaicoding_glm-5.3)
   for (const [k, v] of Object.entries(MODEL_MAP)) {
     if (k.toLowerCase() === lower) return v as BackendModelId;
   }
@@ -89,17 +92,19 @@ export function resolveModel(raw: unknown): BackendModelId {
     if (k.toLowerCase() === lower) return v as BackendModelId;
   }
 
-  // Claude family
+  // Claude family -> coding-plan tier GLM-5.3 (real sonnet/opus replacement)
   if (CLAUDE_PATTERN.test(m) || lower.startsWith('claude-')) return 'zaicoding_glm-5.3';
 
-  // Heuristic: любые glm упоминания → соответствующий backend
+  // Heuristic: glm family
   if (lower.includes('glm-5.3') || lower.includes('glm5.3') || lower.includes('glm-5')) {
     if (lower.includes('flash')) return 'zai_glm-5.3-flash';
     if (lower.includes('turbo')) return 'zai_glm-5-turbo';
     return 'zaicoding_glm-5.3';
   }
   if (lower.includes('glm-coding') || lower.includes('coding')) return 'zaicoding_glm-5.3';
-  if (lower.includes('deepseek') || lower.includes('auto')) return 'zai_auto';
+  if (lower.includes('deepseek-v4-pro')) return 'tdpsk_deepseek-v4-pro-202606';
+  if (lower.includes('deepseek')) return 'tdpsk_deepseek-v4-flash-202605';
+  if (lower.includes('auto')) return 'zai_auto';
 
   return DEFAULT_BACKEND_MODEL;
 }

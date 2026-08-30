@@ -1,7 +1,8 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { ProxyConfig } from '../config.js';
 import type { Logger } from '../utils/logger.js';
-import { backendFetchWithRetry } from '../backend.js';
+import { backendFetchWithRetry, type BackendFetchConfig } from '../backend.js';
+import { backendStreamAndAggregate } from '../upstream.js';
 import { sseDone } from '../utils/sse.js';
 import { convertAnthropicRequestToOpenAI } from '../convert/anthropic-to-openai.js';
 import { convertOpenAIResponseToAnthropic, OpenAIToAnthropicStreamConverter } from '../convert/openai-to-anthropic.js';
@@ -42,7 +43,7 @@ function openAIErrorToAnthropic(status: number, bodyText: string): object {
 function validateAnthropicRequest(body: AnthropicMessagesRequest): string | null {
   if (!body.model || typeof body.model !== 'string') return 'model is required';
   if (!Array.isArray(body.messages)) return 'messages must be array';
-  // max_tokens требуется, но ставим дефолт позже — не ошибка
+  // max_tokens is optional — we set a default before the backend call
   for (let i = 0; i < body.messages.length; i++) {
     const m = body.messages[i] as unknown as Record<string, unknown>;
     if (m === null || typeof m !== 'object') return `messages[${i}] must be object`;
@@ -52,6 +53,24 @@ function validateAnthropicRequest(body: AnthropicMessagesRequest): string | null
   if (body.tools !== undefined && !Array.isArray(body.tools)) return 'tools must be array';
   if (body.stop_sequences !== undefined && !Array.isArray(body.stop_sequences)) return 'stop_sequences must be array';
   return null;
+}
+
+function backendConfig(config: ProxyConfig): BackendFetchConfig {
+  return {
+    backendUrl: config.backendUrl,
+    backendTimeoutMs: config.backendTimeoutMs,
+    backendTimeoutSeconds: config.backendTimeoutSeconds,
+    backendMaxRetries: config.backendMaxRetries,
+    backendRetryBaseMs: config.backendRetryBaseMs,
+    reqHeadersPath: config.reqHeadersPath,
+    staticHeaders: config.staticHeaders,
+    originMode: config.originMode,
+    agentId: config.agentId,
+    sessionId: config.sessionId,
+    sessionKey: config.sessionKey,
+    proxyApiKey: config.proxyApiKey,
+    anthropic: true,
+  };
 }
 
 export async function handleAnthropicMessages(
@@ -89,8 +108,13 @@ export async function handleAnthropicMessages(
   const { openAIRequest, backendModel, stream } = conv;
   const backendBody: Record<string, unknown> = { ...openAIRequest } as unknown as Record<string, unknown>;
   delete backendBody['stream_options'];
+  // Upstream is ALWAYS streamed (real-client behavior) unless disabled via FORCE_UPSTREAM_STREAM=0.
+  if (config.forceUpstreamStream) delete backendBody['stream'];
 
-  logger.debug(requestId, `ANTHROPIC ${stream ? 'STREAM' : 'NONSTREAM'} model=${anthropicModel} -> ${backendModel} msgs=${openAIRequest.messages.length}`);
+  logger.debug(
+    requestId,
+    `ANTHROPIC ${stream ? 'STREAM' : 'NONSTREAM'} model=${anthropicModel} -> ${backendModel} msgs=${openAIRequest.messages.length}`,
+  );
 
   if (stream) await handleAnthropicStream(backendBody, anthropicModel, backendModel, res, config, logger, requestId);
   else await handleAnthropicNonStream(backendBody, anthropicModel, backendModel, res, config, logger, requestId);
@@ -127,7 +151,14 @@ async function handleAnthropicStream(
   const converter = new OpenAIToAnthropicStreamConverter({ anthropicModel, openAIModel: anthropicModel });
 
   try {
-    const r = await backendFetchWithRetry(backendBody, backendModel, config, logger, requestId);
+    // Upstream is ALWAYS streamed with stream_options omitted (real-client zai body shape)
+    const r = await backendFetchWithRetry(
+      { ...backendBody, stream: true },
+      backendModel,
+      backendConfig(config),
+      logger,
+      requestId,
+    );
 
     if (!r.ok) {
       const t = await r.text().catch(() => '');
@@ -179,7 +210,7 @@ async function handleAnthropicStream(
         } catch {
           continue;
         }
-        // Пробрасываем бэкенд-ошибки как anthropic error
+        // Inline backend error -> anthropic error
         if (p !== null && typeof p === 'object' && 'error' in p) {
           const msg = JSON.stringify(p).slice(0, 600);
           if (!clientClosed) res.write(`event: error\ndata: ${JSON.stringify(anthropicErrorShape(msg))}\n\n`);
@@ -223,19 +254,33 @@ async function handleAnthropicNonStream(
   requestId: string,
 ): Promise<void> {
   try {
-    const r = await backendFetchWithRetry(backendBody, backendModel, config, logger, requestId);
-    const t = await r.text().catch(() => '');
-    if (!r.ok) {
-      logger.error(requestId, `ANTHROPIC NONSTREAM backend ${r.status}`, t.slice(0, 700));
-      return sendJson(res, r.status, openAIErrorToAnthropic(r.status, t));
+    let openAI: OpenAIChatResponse;
+
+    if (config.forceUpstreamStream) {
+      // Upstream stream:true + aggregate into a chat.completion (real-client transport)
+      openAI = await backendStreamAndAggregate(backendBody, backendModel, backendConfig(config), logger, requestId);
+    } else {
+      const r = await backendFetchWithRetry(
+        { ...backendBody, stream: false },
+        backendModel,
+        backendConfig(config),
+        logger,
+        requestId,
+      );
+      const t = await r.text().catch(() => '');
+      if (!r.ok) {
+        logger.error(requestId, `ANTHROPIC NONSTREAM backend ${r.status}`, t.slice(0, 700));
+        return sendJson(res, r.status, openAIErrorToAnthropic(r.status, t));
+      }
+      let p: unknown;
+      try {
+        p = JSON.parse(t);
+      } catch {
+        return sendJson(res, 502, anthropicErrorShape('bad json from backend', 'api_error'));
+      }
+      openAI = p as OpenAIChatResponse;
     }
-    let p: unknown;
-    try {
-      p = JSON.parse(t);
-    } catch {
-      return sendJson(res, 502, anthropicErrorShape('bad json from backend', 'api_error'));
-    }
-    const openAI = p as OpenAIChatResponse;
+
     if (!openAI.choices || !Array.isArray(openAI.choices) || openAI.choices.length === 0) {
       return sendJson(res, 502, anthropicErrorShape('invalid backend response: missing choices', 'api_error'));
     }
@@ -248,8 +293,11 @@ async function handleAnthropicNonStream(
     }
   } catch (e) {
     const isAbort = e instanceof DOMException && e.name === 'AbortError';
+    const status = (e as { status?: number }).status;
     logger.error(requestId, `ANTHROPIC NONSTREAM error abort=${isAbort}`, String(e).slice(0, 600));
     if (isAbort) sendJson(res, 504, anthropicErrorShape('backend timeout', 'api_error'));
+    else if (typeof status === 'number' && status >= 400)
+      sendJson(res, status >= 500 ? 502 : status, anthropicErrorShape(String((e as Error).message).slice(0, 600)));
     else sendJson(res, 502, anthropicErrorShape(String(e).slice(0, 600)));
   }
 }

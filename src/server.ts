@@ -6,6 +6,8 @@ import { getModelsList, getModelMapSnapshot } from './models.js';
 import { handleOpenAIChat } from './handlers/openai.js';
 import { handleAnthropicMessages } from './handlers/anthropic.js';
 import { getJwtCacheInfo } from './auth.js';
+import { invalidateRequestHeadersCache } from './contract.js';
+import * as fs from 'node:fs';
 import type { OpenAIChatRequest } from './types/openai.js';
 import type { AnthropicMessagesRequest } from './types/anthropic.js';
 
@@ -31,7 +33,7 @@ function parseAuthHeader(req: http.IncomingMessage): string {
   // AutoClaw legacy
   const alt = req.headers['x-authorization'] as string | undefined;
   if (typeof alt === 'string' && alt.trim()) return alt.trim();
-  // query ?api_key=...
+  // query ?api_key=***
   try {
     const url = new URL(req.url ?? '/', 'http://localhost');
     const q = url.searchParams.get('api_key') ?? url.searchParams.get('key');
@@ -40,7 +42,29 @@ function parseAuthHeader(req: http.IncomingMessage): string {
   return '';
 }
 
+function watchRequestHeaders(config: ProxyConfig): void {
+  // The desktop app refreshes request-headers.json periodically; on any mtime/size
+  // change, drop both caches so the next request re-reads the fresh JWT + headers.
+  let lastSig = '';
+  try {
+    const st = fs.statSync(config.reqHeadersPath);
+    lastSig = `${st.mtimeMs}:${st.size}`;
+  } catch {}
+  setInterval(() => {
+    try {
+      const st = fs.statSync(config.reqHeadersPath);
+      const sig = `${st.mtimeMs}:${st.size}`;
+      if (sig !== lastSig) {
+        lastSig = sig;
+        invalidateRequestHeadersCache();
+      }
+    } catch {}
+  }, 2000).unref();
+}
+
 export function createServer(config: ProxyConfig, logger: Logger): http.Server {
+  watchRequestHeaders(config);
+
   const server = http.createServer(async (req, res) => {
     const requestId = crypto.randomUUID();
     const url = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
@@ -96,9 +120,10 @@ export function createServer(config: ProxyConfig, logger: Logger): http.Server {
         200,
         {
           name: 'zai-proxy',
-          version: '2.1.0',
+          version: '3.0.0',
           uptime: Math.floor(process.uptime()),
           endpoints: ['/health', '/v1/models', '/v1/chat/completions', '/v1/messages'],
+          contract: 'autoclaw-request-contract-v1',
         },
         config.corsAllowOrigin,
       );
@@ -106,7 +131,7 @@ export function createServer(config: ProxyConfig, logger: Logger): http.Server {
 
     // --- Health ---
     if ((url.pathname === '/health' || url.pathname === '/v1/health' || url.pathname === '/ping') && req.method === 'GET') {
-      const base: Record<string, unknown> = { status: 'ok', uptime: process.uptime(), version: '2.1.0' };
+      const base: Record<string, unknown> = { status: 'ok', uptime: process.uptime(), version: '3.0.0' };
       if (config.enableHealthDetails) {
         base['model_map'] = getModelMapSnapshot();
         base['jwt_cache'] = getJwtCacheInfo();
@@ -118,6 +143,10 @@ export function createServer(config: ProxyConfig, logger: Logger): http.Server {
           logLevel: config.logLevel,
           auth: config.proxyApiKey ? 'enabled' : 'disabled',
           cors: config.corsAllowOrigin,
+          forceUpstreamStream: config.forceUpstreamStream,
+          originMode: config.originMode,
+          agentId: config.agentId,
+          sessionKey: config.sessionKey,
         };
         base['memory'] = process.memoryUsage();
       }

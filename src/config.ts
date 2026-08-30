@@ -1,7 +1,17 @@
 import * as path from 'node:path';
 import * as os from 'node:os';
+import * as crypto from 'node:crypto';
+import type { AutoClawOriginMode } from './backend.js';
 
 export type LogLevel = 'debug' | 'info' | 'error';
+
+/** Static AutoClaw client headers, mirrors providers.zai.models[*].headers in openclaw.json. */
+export const STATIC_AUTOCLAW_HEADERS: Record<string, string> = {
+  'X-Tm': 'win',
+  'X-Version': '1.17.8',
+  'X-Channel': 'official',
+  'X-Lang': 'ru',
+};
 
 export interface ProxyConfig {
   readonly port: number;
@@ -14,10 +24,21 @@ export interface ProxyConfig {
   readonly logJson: boolean;
   readonly bodyLimitBytes: number;
   readonly backendTimeoutMs: number;
+  readonly backendTimeoutSeconds: number | undefined;
   readonly backendMaxRetries: number;
   readonly backendRetryBaseMs: number;
   readonly corsAllowOrigin: string;
   readonly enableHealthDetails: boolean;
+  /** Always-upstream-streaming mode (real-client behavior). */
+  readonly forceUpstreamStream: boolean;
+  /** Static AutoClaw client headers (X-Tm, X-Version, X-Channel, X-Lang). */
+  readonly staticHeaders: Record<string, string>;
+  /** AutoClaw origin mode: desktop (pc) | web | app. Drives X-Client-Type + origin headers. */
+  readonly originMode: AutoClawOriginMode;
+  /** Stable agent/session identity for the request contract. */
+  readonly agentId: string;
+  readonly sessionId: string;
+  readonly sessionKey: string;
 }
 
 function parsePort(v: string | undefined, fallback: number): number {
@@ -62,6 +83,28 @@ function parseBackendUrl(v: string | undefined): string {
   }
 }
 
+function parseOriginMode(v: string | undefined): AutoClawOriginMode {
+  const s = (v ?? '').trim().toLowerCase();
+  if (s === 'web') return 'web';
+  if (s === 'app' || s === 'mobile' || s === 'im') return 'app';
+  return 'desktop';
+}
+
+function parseStaticHeaders(v: string | undefined): Record<string, string> {
+  if (!v || !v.trim()) return { ...STATIC_AUTOCLAW_HEADERS };
+  try {
+    const parsed: unknown = JSON.parse(v);
+    if (parsed !== null && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      const out: Record<string, string> = {};
+      for (const [k, val] of Object.entries(parsed as Record<string, unknown>)) {
+        if (typeof val === 'string' && val.trim()) out[k] = val.trim();
+      }
+      return { ...STATIC_AUTOCLAW_HEADERS, ...out };
+    }
+  } catch {}
+  return { ...STATIC_AUTOCLAW_HEADERS };
+}
+
 export function loadConfig(): ProxyConfig {
   const port = parsePort(process.env['PORT'], 18888);
   const host = (process.env['HOST'] ?? process.env['BIND'] ?? '127.0.0.1').trim() || '127.0.0.1';
@@ -69,7 +112,7 @@ export function loadConfig(): ProxyConfig {
   const reqHeadersPath =
     (process.env['AUTOCLAW_REQ_HEADERS'] ?? process.env['JWT_PATH'] ?? path.join(stateDir, 'request-headers.json')).trim();
   const backendUrl = parseBackendUrl(process.env['ZAI_BACKEND_URL']);
-  const rawKey = process.env['PROXY_API_KEY'] ?? process.env['API_KEY'];
+  const rawKey = process.env['PROXY_API_KEY'] ?? process.env['API_KEY'] ?? process.env['ZAI_PROXY_API_KEY'];
   const proxyApiKey = rawKey !== undefined && rawKey !== '' ? rawKey : undefined;
   const logLevel = parseLogLevel(process.env['LOG']);
   const logJson = parseBool(process.env['LOG_JSON'], false);
@@ -79,6 +122,15 @@ export function loadConfig(): ProxyConfig {
   const backendRetryBaseMs = parseIntEnv('BACKEND_RETRY_BASE_MS', process.env['BACKEND_RETRY_BASE_MS'], 400);
   const corsAllowOrigin = (process.env['CORS_ALLOW_ORIGIN'] ?? '*').trim() || '*';
   const enableHealthDetails = parseBool(process.env['HEALTH_DETAILS'], true);
+  const forceUpstreamStream = parseBool(process.env['FORCE_UPSTREAM_STREAM'], true);
+  const originMode = parseOriginMode(process.env['AUTOCLAW_ORIGIN'] ?? process.env['AUTOCLAW_ORIGIN_MODE']);
+  const agentId = (process.env['AUTOCLAW_AGENT_ID'] ?? 'main').trim() || 'main';
+  // Real client always has a sessionId + sessionKey ("agent:<id>:<sessionId>");
+  // generate stable ones when not provided via env.
+  const sessionId = (process.env['AUTOCLAW_SESSION_ID'] ?? '').trim() || crypto.randomUUID();
+  const sessionKey =
+    (process.env['AUTOCLAW_SESSION_KEY'] ?? '').trim() || `agent:${agentId}:${sessionId}`;
+  const staticHeaders = parseStaticHeaders(process.env['AUTOCLAW_STATIC_HEADERS']);
 
   // Clamp body limit to sane range 1KB .. 100MB
   if (bodyLimitBytes < 1024 || bodyLimitBytes > 100 * 1024 * 1024) {
@@ -87,6 +139,8 @@ export function loadConfig(): ProxyConfig {
   if (backendTimeoutMs !== 0 && backendTimeoutMs < 1000) {
     throw new Error(`BACKEND_TIMEOUT_MS too small: ${backendTimeoutMs} (min 1000 or 0 to disable)`);
   }
+
+  const backendTimeoutSeconds = backendTimeoutMs > 0 ? Math.ceil(backendTimeoutMs / 1000) : undefined;
 
   return {
     port,
@@ -99,9 +153,16 @@ export function loadConfig(): ProxyConfig {
     logJson,
     bodyLimitBytes,
     backendTimeoutMs,
+    backendTimeoutSeconds,
     backendMaxRetries,
     backendRetryBaseMs,
     corsAllowOrigin,
     enableHealthDetails,
+    forceUpstreamStream,
+    staticHeaders,
+    originMode,
+    agentId,
+    sessionId,
+    sessionKey,
   };
 }
